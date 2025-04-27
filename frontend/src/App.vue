@@ -1,9 +1,5 @@
 <template>
   <StatusWindow />
-  <h1 class=" font-medium text-2xl">Hello, world!</h1>
-  <div class="card rounded-none">
-    <p>Test Tailwind</p>
-  </div>
   <RouterView />
 </template>
 <script lang="ts">
@@ -20,12 +16,12 @@ export default {
     }
   },
   mounted(){
-    this.StatusWindowAPI.createStatusWindow({
-      status: this.StatusWindowAPI.getCodes.success,
-      text: 'Status window successfully installed!',
-      type: this.StatusWindowAPI.getTypes.detail,
-      time: 100000
-    });
+    // this.StatusWindowAPI.createStatusWindow({
+    //   status: this.StatusWindowAPI.getCodes.success,
+    //   text: 'Status window successfully installed!',
+    //   type: this.StatusWindowAPI.getTypes.detail,
+    //   time: 100000
+    // });
   }
 }
 </script>
