@@ -11,7 +11,7 @@
   --color-bg-main: #F3F3F3;
   --color-bg-second: #D7D7D7;
   --color-bg-second-hover: #C4C4C4;
-  --color-bg-input: #FDFDFD;
+  --color-bg-input: #FFFFFF;
   --color-bg-chat-message-other: #555555;
   --color-bg-blur: rgba(0,0,0,0.25);
   --color-text-main: #141414;
@@ -37,7 +37,10 @@
   }
   input, textarea {
     outline: none;
-    background-color: var(--color-bg-main);
+    background-color: var(--color-bg-input);
+    border: 2px solid var(--color-border-main);
+    min-width: none;
+    width: auto;
   }
 }
 @layer components {

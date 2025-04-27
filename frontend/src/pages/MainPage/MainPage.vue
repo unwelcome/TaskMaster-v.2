@@ -1,5 +1,5 @@
 <template>
-<div class="flex flex-row items-stretch w-full h-svh">
+<div class="flex flex-row items-stretch w-full h-svh bg-bg-main">
   <!--BurgeMenu-->
   <Transition name="fade">
     <burgerMenu v-if="burgerMenuFlag" @close-burger-menu="burgerMenuFlag = false"/>

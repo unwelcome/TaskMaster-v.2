@@ -8,7 +8,11 @@ const router = createRouter({
       name: 'MainPage',
       component: () => import('../pages/MainPage/MainPage.vue'),
       children: [
-        
+        {
+          path: 'seminars',
+          name: 'SeminarsPage',
+          component: () => import('../pages/MainPage/SubPages/SeminarsPage/SeminarsPage.vue')
+        }
       ]
     }
   ],
