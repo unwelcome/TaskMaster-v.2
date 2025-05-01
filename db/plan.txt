@@ -1,0 +1,120 @@
+Enum group_roles{
+  student
+  senior
+  teacher
+}
+
+Table users {
+  id integer [primary key]
+  password varchar
+  email varchar
+  first_name varchar
+  last_name varchar
+  middle_name varchar
+  created_at timestamp
+  avatar_url text
+}
+
+Table groups {
+  id integer [primary key]
+  title varchar
+  password varchar
+  score_limit float
+  topic_limit integer
+  group_status boolean
+  chat_status boolean
+  enable_senior boolean
+}
+
+Table senior_access{
+  id integer [primary key]
+  group_id integer
+  use_closed_chat boolean
+  create_seminars boolean
+  create_topics boolean
+  evaluate_topics boolean
+}
+
+Table group_members{
+  id integer [primary key]
+  user_id integer
+  group_id integer
+  role group_roles
+}
+
+Table chats{
+  id integer [primary key]
+  group_id integer
+}
+
+Table chat_messages{
+  id integer [primary key]
+  chat_id integer
+  author_id integer
+  created_at timestamp
+  message text
+}
+
+Table seminars{
+  id integer [primary key]
+  group_id integer
+  title varchar
+  total_topics integer
+  free_topics integer
+  date timestamp
+}
+
+Table topics{
+  id integer [primary key]
+  seminar_id integer
+  score float
+  total_space integer
+  free_space integer
+  status boolean
+}
+
+Table topic_executors{
+  id integer [primary key]
+  topic_id integer
+  user_id integer
+}
+
+Table topic_files{
+  id integer [primary key]
+  topic_id integer
+  url text
+  name varchar
+  size integer
+}
+
+Table performance{
+  id integer [primary key]
+  user_id integer
+  group_id integer
+  seminar_id integer
+  score float
+}
+
+Ref group_senior_access: groups.id - senior_access.group_id
+
+Ref group_members_users: group_members.user_id > users.id
+Ref group_members_groups: group_members.group_id > groups.id
+
+Ref group_chat: chats.group_id - groups.id
+
+Ref chat_messages_chat: chat_messages.chat_id > chats.id
+Ref chat_messages_author: chat_messages.author_id > users.id
+
+Ref seminars_group: seminars.group_id > groups.id
+
+Ref topics_seminars: topics.seminar_id > seminars.id
+
+Ref topic_executors_topic: topic_executors.topic_id > topics.id
+Ref topic_executors_user: topic_executors.user_id > users.id
+
+Ref topic_files_topic: topic_files.topic_id > topics.id
+
+Ref performance_users: performance.user_id > users.id
+Ref performance_groups: performance.group_id > groups.id
+Ref performance_sseminars: performance.seminar_id > seminars.id
+
