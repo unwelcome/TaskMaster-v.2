@@ -11,7 +11,12 @@ const router = createRouter({
         {
           path: 'seminars',
           name: 'SeminarsPage',
-          component: () => import('../pages/MainPage/SubPages/SeminarsPage/SeminarsPage.vue')
+          component: () => import('../pages/MainPage/SubPages/SeminarsPage/SeminarsPage.vue'),
+        },
+        {
+          path: 'chat',
+          name: 'ChatPage',
+          component: () => import('../pages/MainPage/SubPages/ChatPage/ChatPage.vue'),
         }
       ]
     }

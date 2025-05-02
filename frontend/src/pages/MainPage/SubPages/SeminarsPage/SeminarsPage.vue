@@ -1,24 +1,21 @@
 <template>
-  <div class="flex flex-col items-stretch gap-2">
+  <div class="flex flex-col items-stretch gap-2 h-full overflow-hidden">
     <seminarHeaderItem :can-create="true" @create-seminar="createSeminarFlag = true"/>
 
     <createSeminarItem v-if="createSeminarFlag" @reject="createSeminarFlag = false" @approve=""/>
 
-    <seminarItem 
-      :name="'Семинар №1 Основы работы с Docker и Docker-compose'"
-      :topic-count="15"
-      :topic-free-count="5"
-      :date="'12.05.2024'"
-      :can-delete="true"
-    />
+    <div class="flex flex-col gap-2 items-stretch grow scrollable scrollable-invisible">
 
-    <seminarItem 
-      :name="'Семинар №1 Основы работы с Docker и Docker-compose'"
-      :topic-count="15"
-      :topic-free-count="5"
-      :date="'12.05.2024'"
-      :can-delete="false"
-    />
+      <seminarItem 
+        v-for="i in 3"
+        :name="'Семинар №1 Основы работы с Docker и Docker-compose'"
+        :topic-count="15"
+        :topic-free-count="5"
+        :date="'12.05.2024'"
+        :can-delete="true"
+      />
+
+    </div>
     
   </div>
 </template>

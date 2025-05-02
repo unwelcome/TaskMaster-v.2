@@ -6,7 +6,7 @@
           <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20M4 19.5C4 20.163 4.26339 20.7989 4.73223 21.2678C5.20107 21.7366 5.83696 22 6.5 22H20V2H6.5C5.83696 2 5.20107 2.26339 4.73223 2.73223C4.26339 3.20107 4 3.83696 4 4.5V19.5Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </bookmarkItem>
-      <bookmarkItem :title="'Чат'">
+      <bookmarkItem :title="'Чат'" :selected="$route.name === 'ChatPage'" @click="$router.push({name: 'ChatPage'})">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -25,7 +25,7 @@
         </svg>
       </bookmarkItem>
     </div>
-    <div class="flex flex-col border-2 border-border-main grow rounded-md p-4">
+    <div class="flex flex-col border-2 border-border-main grow rounded-md p-4 overflow-hidden">
       <slot></slot>
     </div>
   </div>
