@@ -3,7 +3,7 @@
     <div>
       <slot></slot>
     </div>
-    <p>{{ title }}</p>
+    <p class="select-none">{{ title }}</p>
   </div>
 </template>
 <script lang="ts">

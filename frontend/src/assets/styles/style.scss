@@ -17,6 +17,9 @@
   --color-bg-input: #FFFFFF;
   --color-bg-chat-message-other: #555555;
   --color-bg-blur: rgba(0,0,0,0.25);
+  --color-bg-table-header: rgba(217, 217, 217, 1);//#D9D9D9;
+  --color-bg-table-even: rgba(217, 217, 217, 0.4);//#D9D9D9;
+  --color-bg-table-odd: transparent;
 
   --color-text-main: #141414;
   --color-text-second: #EDEDED;
@@ -180,16 +183,26 @@
       border-radius: var(--scroll-bar-border-radius);
       transition: background-color 1s ease-in-out;
     }
-  }
 
-  .scrollable-invisible{
-    scrollbar-width: 0px;
-
-    &::-webkit-scrollbar{
-      width: 0px;
+    &-invisible{
+      scrollbar-width: 0px;
+  
+      &::-webkit-scrollbar{
+        width: 0px;
+      }
+      &::-moz-scrollbar {
+        width: 0px;
+      }
     }
-    &::-moz-scrollbar {
-      width: 0px;
+
+    &-x-y{
+      --scroll-bar-width: 6px;
+      --scroll-bar-height: 6px;
+
+      overflow-x: scroll;
+      overflow-y: scroll;
+      scrollbar-width: thin;
+      scrollbar-color: var(--scroll-thumb-color) #dddddd;
     }
   }
 }

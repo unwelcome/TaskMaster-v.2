@@ -1,5 +1,5 @@
 <template>
-<div class="w-80 flex flex-col items-stretch shrink-0 bg-bg-second p-2 gap-4">
+<div class="w-80 flex flex-col items-stretch shrink-0 bg-bg-second p-2 gap-4" id="leftSidebar">
   <!--Logo-->
   <div class="flex flex-col items-center">
     <h1 class="text-[40px] text-text-logo"><strong class="font-medium text-main">Task</strong>Master</h1>

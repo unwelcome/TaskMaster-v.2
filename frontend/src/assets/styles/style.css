@@ -14,6 +14,9 @@
   --color-bg-input: #FFFFFF;
   --color-bg-chat-message-other: #555555;
   --color-bg-blur: rgba(0,0,0,0.25);
+  --color-bg-table-header: rgba(217, 217, 217, 1);
+  --color-bg-table-even: rgba(217, 217, 217, 0.4);
+  --color-bg-table-odd: transparent;
   --color-text-main: #141414;
   --color-text-second: #EDEDED;
   --color-text-description: #757575;
@@ -167,5 +170,13 @@
   }
   .scrollable-invisible::-moz-scrollbar {
     width: 0px;
+  }
+  .scrollable-x-y {
+    --scroll-bar-width: 6px;
+    --scroll-bar-height: 6px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb-color) #dddddd;
   }
 }/*# sourceMappingURL=style.css.map */

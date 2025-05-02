@@ -17,6 +17,11 @@ const router = createRouter({
           path: 'chat',
           name: 'ChatPage',
           component: () => import('../pages/MainPage/SubPages/ChatPage/ChatPage.vue'),
+        },
+        {
+          path: 'performance',
+          name: 'PerformancePage',
+          component: () => import('../pages/MainPage/SubPages/PerformancePage/PerformancePage.vue'),
         }
       ]
     }
