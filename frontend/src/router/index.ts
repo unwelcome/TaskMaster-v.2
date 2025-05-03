@@ -22,6 +22,11 @@ const router = createRouter({
           path: 'performance',
           name: 'PerformancePage',
           component: () => import('../pages/MainPage/SubPages/PerformancePage/PerformancePage.vue'),
+        },
+        {
+          path: 'settings',
+          name: 'SettingsPage',
+          component: () => import('../pages/MainPage/SubPages/SettingsPage/SettingsPage.vue'),
         }
       ]
     }

@@ -179,4 +179,20 @@
     scrollbar-width: thin;
     scrollbar-color: var(--scroll-thumb-color) #dddddd;
   }
+  .custom-input {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    -moz-column-gap: 4px;
+         column-gap: 4px;
+    outline: none;
+    border-radius: 4px;
+    background-color: var(--color-bg-input);
+  }
+  .custom-input > input {
+    @apply text-lg px-2 py-1 bg-transparent grow rounded;
+  }
+  .custom-input:focus-within {
+    outline: 2px solid var(--color-border-focus);
+  }
 }/*# sourceMappingURL=style.css.map */

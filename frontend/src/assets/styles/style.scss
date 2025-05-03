@@ -205,4 +205,22 @@
       scrollbar-color: var(--scroll-thumb-color) #dddddd;
     }
   }
+
+  .custom-input{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    column-gap: 4px;
+    outline: none;
+    border-radius: 4px;
+    background-color: var(--color-bg-input);
+
+    & > input{
+      @apply text-lg px-2 py-1 bg-transparent grow rounded;
+    }
+
+    &:focus-within{
+      outline: 2px solid var(--color-border-focus);
+    }
+  }
 }

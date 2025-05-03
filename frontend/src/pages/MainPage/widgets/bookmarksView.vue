@@ -16,7 +16,7 @@
           <path d="M18 20V10M12 20V4M6 20V14" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </bookmarkItem>
-      <bookmarkItem :title="'Настройки'">
+      <bookmarkItem :title="'Настройки'" :selected="$route.name === 'SettingsPage'" @click="$router.push({name: 'SettingsPage'})">
         <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0_8_203)">
           <path d="M12.4128 15C14.0697 15 15.4128 13.6569 15.4128 12C15.4128 10.3431 14.0697 9 12.4128 9C10.756 9 9.41284 10.3431 9.41284 12C9.41284 13.6569 10.756 15 12.4128 15Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
