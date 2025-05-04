@@ -23,6 +23,7 @@
   --color-text-placeholder: #A9A9A9;
   --color-text-chat: #AAFF33;
   --color-text-logo: #404040;
+  --color-text-error: #F24343;
   --color-border-main: #D7D7D7;
   --color-border-second: #949494;
   --color-border-focus: #2C80FF;
@@ -59,6 +60,11 @@
     line-height: var(--text-lg--line-height);
     transition: background-color 0.1s ease-out;
     cursor: pointer;
+  }
+  .btn p {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+            user-select: none;
   }
   .btn-main {
     background-color: var(--color-main);
@@ -183,16 +189,57 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    width: 100%;
     -moz-column-gap: 4px;
          column-gap: 4px;
     outline: none;
     border-radius: 4px;
+    border: 2px solid var(--color-border-main);
     background-color: var(--color-bg-input);
+    padding: 0 8px;
   }
   .custom-input > input {
-    @apply text-lg px-2 py-1 bg-transparent grow rounded;
+    @apply text-lg py-1 bg-transparent grow rounded border-none min-w-0 w-full;
   }
   .custom-input:focus-within {
     outline: 2px solid var(--color-border-focus);
+  }
+  .custom-input-slider {
+    --on: var(--color-main);
+    --off: var(--color-bg-second);
+    --circle: rgb(255,255,255);
+    display: block;
+    position: relative;
+    cursor: pointer;
+  }
+  .custom-input-slider:before, .custom-input-slider:after {
+    content: "";
+    position: absolute;
+  }
+  .custom-input-slider:before {
+    height: 100%;
+    width: 200%;
+    background-color: var(--off);
+    box-shadow: 0 0 0 1px var(--off);
+    transform: translate(-25%, 0);
+    border-radius: 30px;
+    transition: all 0.2s ease-in-out;
+  }
+  .custom-input-slider:after {
+    width: 80%;
+    height: 80%;
+    margin-top: 10%;
+    margin-left: 10%;
+    background-color: var(--circle);
+    border-radius: 30px;
+    transform: translate(-60%, 0);
+    transition: all 0.2s ease-in-out;
+  }
+  .custom-input-slider:checked:after {
+    transform: translate(60%, 0);
+  }
+  .custom-input-slider:checked:before {
+    background-color: var(--on);
+    box-shadow: 0 0 0 1px var(--on);
   }
 }/*# sourceMappingURL=style.css.map */

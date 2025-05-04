@@ -1,27 +1,17 @@
 <template>
   <StatusWindow />
+  <approveWindow />
+  
   <RouterView />
 </template>
 <script lang="ts">
 import StatusWindow from './lib/StatusWindow/components/statusWindow.vue';
-import { useStatusWindowAPI } from './lib/StatusWindow/statusWindowAPI';
+import approveWindow from './lib/ApproveWindow/approveWindow.vue';
 
 export default {
   components: {
-    StatusWindow
+    StatusWindow,
+    approveWindow,
   },
-  data(){ 
-    return{
-      StatusWindowAPI: useStatusWindowAPI(),
-    }
-  },
-  mounted(){
-    // this.StatusWindowAPI.createStatusWindow({
-    //   status: this.StatusWindowAPI.getCodes.success,
-    //   text: 'Status window successfully installed!',
-    //   type: this.StatusWindowAPI.getTypes.detail,
-    //   time: 100000
-    // });
-  }
 }
 </script>
