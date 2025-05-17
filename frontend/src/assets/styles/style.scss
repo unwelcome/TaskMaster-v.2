@@ -61,7 +61,7 @@
     gap: 8px;
     align-items: center;
     border-radius: var(--radius-md);
-    padding: 8px 4px;
+    padding: 4px 8px;
     font-size: var(--text-lg);
     line-height: var(--text-lg--line-height);
     transition: background-color .10s ease-out;
@@ -278,5 +278,10 @@
         box-shadow: 0 0 0 1px var(--on);
       }
     }
+  }
+
+  .topic-grid{
+    display: grid;
+    grid-template-columns: 5fr clamp(50px, 10%, 70px) clamp(50px, 10%, 60px) clamp(50px, 10%, 80px) clamp(50px, 15%, 90px) 50px;
   }
 }

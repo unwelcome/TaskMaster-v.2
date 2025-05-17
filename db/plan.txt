@@ -67,6 +67,7 @@ Table seminars{
 Table topics{
   id integer [primary key]
   seminar_id integer
+  title varchar
   score float
   total_space integer
   free_space integer

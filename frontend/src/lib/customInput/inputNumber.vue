@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col items-start">
+  <div class="flex flex-col items-start relative">
     <label v-if="inpShowTitle" :class="inpTitleClass" @click="($refs.inputEl as HTMLElement).focus()">{{ inpTitle }}</label>
 
-    <div class="custom-input">
+    <div class="custom-input" :class="inpInputClass">
       <input 
         type="number" 
         :min="inpMinValue"
@@ -40,6 +40,12 @@ export default {
     },
 
     inpPlaceholder: {
+      type: String,
+      required: false,
+      default: '',
+    },
+
+    inpInputClass: {
       type: String,
       required: false,
       default: '',

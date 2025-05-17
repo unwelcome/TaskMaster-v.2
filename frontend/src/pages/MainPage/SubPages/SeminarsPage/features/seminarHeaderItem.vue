@@ -21,7 +21,6 @@
   </div>
 </template>
 <script lang="ts">
-import IconButton from '@/shared/iconButton.vue';
 
 export default {
   emits: ['createSeminar'],

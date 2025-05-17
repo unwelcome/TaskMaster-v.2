@@ -42,6 +42,6 @@ export default {
   .grid-container{
     display: grid;
     grid-template-columns: 5fr clamp(50px, 10%, 100px) clamp(50px, 10%, 130px) clamp(50px, 10%, 100px);
-    gap: 10px;
+    gap: 8px;
   }
 </style>
