@@ -200,6 +200,10 @@
       }
     }
 
+    &-track-invisible{
+      --scroll-track-color: transparent;
+    }
+
     &-x-y{
       --scroll-bar-width: 6px;
       --scroll-bar-height: 6px;

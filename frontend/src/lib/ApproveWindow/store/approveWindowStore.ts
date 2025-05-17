@@ -9,13 +9,14 @@ export const useApproveWindowStore = defineStore('approveWindow', {
     }
   },
   actions: {
-    createApproveWindow(title: string, answers: IApproveWindowAnswers[]): number{
+    createApproveWindow(title: string, text: string, answers: IApproveWindowAnswers[]): number{
       if(answers.length === 0) return -1;
 
       const currentID = this.approveWindowID++;
       this.approveWindowQueue.push({
         id: currentID,
         title: title,
+        text: text,
         answers: answers,
       });
 

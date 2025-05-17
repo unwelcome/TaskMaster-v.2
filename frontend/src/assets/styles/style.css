@@ -177,6 +177,9 @@
   .scrollable-invisible::-moz-scrollbar {
     width: 0px;
   }
+  .scrollable-track-invisible {
+    --scroll-track-color: transparent;
+  }
   .scrollable-x-y {
     --scroll-bar-width: 6px;
     --scroll-bar-height: 6px;

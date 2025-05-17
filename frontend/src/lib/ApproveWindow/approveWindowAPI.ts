@@ -14,6 +14,7 @@ export interface IApproveWindowAnswers{
 export interface IApproveWindow{
   id: number,
   title: string,
+  text: string,
   answers: IApproveWindowAnswers[],
 }
 
@@ -28,8 +29,8 @@ const promiseQueue: IPromiseQueueItem[] = [];
 export function useApproveWindowAPI(){
   const approveWindowStore = useApproveWindowStore();
 
-  const createApproveWindow = (title: string, answers: IApproveWindowAnswers[]):Promise<number> => {
-    const appwroveWindowId = approveWindowStore.createApproveWindow(title, answers);
+  const createApproveWindow = (title: string, text: string, answers: IApproveWindowAnswers[]):Promise<number> => {
+    const appwroveWindowId = approveWindowStore.createApproveWindow(title, text, answers);
 
     let resolveFn: (value: number | PromiseLike<number>) => void;
     let rejectFn: (reason?: any) => void;
@@ -83,8 +84,6 @@ export function useApproveWindowAPI(){
   }
 
   const resolveFirst = (returnID: number):boolean => {
-    console.log('promiseQueue: ', promiseQueue);
-
     promiseQueue[0].resolve(returnID);
     promiseQueue.splice(0, 1);
 

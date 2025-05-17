@@ -58,7 +58,7 @@ export default {
     inpDescriptionClass: {
       type: String,
       required: false,
-      default: 'text-xs text-text-description select-none h-4',
+      default: 'text-xs text-text-description select-none min-h-4',
     },
 
     inpError: {
@@ -74,7 +74,7 @@ export default {
     inpErrorClass: {
       type: String,
       required: false,
-      default: 'text-text-error text-sm select-none h-5',
+      default: 'text-text-error text-sm select-none min-h-5',
     },
 
     inpHideBtns: {

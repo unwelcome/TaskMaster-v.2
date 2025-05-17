@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col items-start">
-    <label class="flex flex-row gap-1 text-base cursor-pointer select-none" :class="inpTitleClass">
+    <label class="flex flex-row items-center gap-1 text-base cursor-pointer select-none" :class="inpTitleClass">
 
       <input 
         type="checkbox" 
         class="custom-input-slider"
-        :style="{'width': `${inpSize}px`, 'height': `${inpSize}px`, 'margin': `0 ${inpSize / 2}px`}"
+        :style="{'width': `${inpSize}px`, 'height': `${inpSize}px`, 'margin': `0 ${inpSize / 2 + 1}px`}"
         v-model="value" 
         @input="updateValue" 
       />
@@ -50,7 +50,7 @@ export default {
     inpDescriptionClass: {
       type: String,
       required: false,
-      default: 'text-xs text-text-description select-none h-4',
+      default: 'text-xs text-text-description select-none min-h-4',
     },
 
     inpDefaultValue: {
