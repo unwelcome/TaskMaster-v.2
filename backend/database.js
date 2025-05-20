@@ -1,12 +1,12 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 const pool = new Pool({
-  host: process.env.NODE_ENV === 'production' ? process.env.DB_HOST : 'localhost', //process.env.NODE_ENV === 'production' ? process.env.DB_HOST : 'localhost'
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD
+  host: process.env.NODE_ENV === 'production' ? process.env.POSTGRES_HOST : 'localhost', //process.env.NODE_ENV === 'production' ? process.env.DB_HOST : 'localhost'
+  port: process.env.POSTGRES_PORT,
+  database: process.env.POSTGRES_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD
 });
 
 // Функция для выполнения SQL запросов
@@ -23,11 +23,11 @@ async function query(text, params) {
 // Пример функции для получения всех пользователей
 async function getAllUsers() {
   console.log(`process.env.NODE_ENV = ${process.env.NODE_ENV}\n
-    process.env.DB_HOST = ${process.env.DB_HOST}\n
-    process.env.DB_PORT = ${process.env.DB_PORT}\n
-    process.env.DB_NAME = ${process.env.DB_NAME}\n
-    process.env.DB_USER = ${process.env.DB_USER}\n
-    process.env.DB_PASSWORD = ${process.env.DB_PASSWORD}`);
+    process.env.DB_HOST = ${process.env.NODE_ENV === 'production' ? process.env.POSTGRES_HOST : 'localhost'}\n
+    process.env.DB_PORT = ${process.env.POSTGRES_PORT}\n
+    process.env.DB_NAME = ${process.env.POSTGRES_DB}\n
+    process.env.DB_USER = ${process.env.POSTGRES_USER}\n
+    process.env.DB_PASSWORD = ${process.env.POSTGRES_PASSWORD}`);
   const result = await query('SELECT * FROM users;');
   return result.rows;
 }

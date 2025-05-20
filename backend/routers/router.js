@@ -8,7 +8,7 @@ router.get('/health', (req,res) => {
 
 router.get('/db/health', async(req,res) => {
   const users = await db.getAllUsers();
-  res.status(200).json(users);
+  res.status(200).json( users);
 })
 
 module.exports = router;
