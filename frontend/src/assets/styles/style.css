@@ -149,24 +149,28 @@
     border-radius: var(--scroll-bar-border-radius);
     -webkit-transition: background-color 1s ease-in-out;
     transition: background-color 1s ease-in-out;
+    cursor: pointer;
   }
   .scrollable::-moz-scrollbar-track {
     background-color: var(--scroll-track-color);
     border-radius: var(--scroll-bar-border-radius);
     -moz-transition: background-color 1s ease-in-out;
     transition: background-color 1s ease-in-out;
+    cursor: pointer;
   }
   .scrollable::-webkit-scrollbar-thumb {
     background-color: var(--scroll-thumb-color);
     border-radius: var(--scroll-bar-border-radius);
     -webkit-transition: background-color 1s ease-in-out;
     transition: background-color 1s ease-in-out;
+    cursor: pointer;
   }
   .scrollable::-moz-scrollbar-thumb {
     background-color: var(--scroll-thumb-color);
     border-radius: var(--scroll-bar-border-radius);
     -moz-transition: background-color 1s ease-in-out;
     transition: background-color 1s ease-in-out;
+    cursor: pointer;
   }
   .scrollable-invisible {
     scrollbar-width: 0px;

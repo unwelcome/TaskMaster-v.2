@@ -171,22 +171,26 @@
       background-color: var(--scroll-track-color);
       border-radius: var(--scroll-bar-border-radius);
       transition: background-color 1s ease-in-out;
+      cursor: pointer;
     }
     &::-moz-scrollbar-track {
       background-color: var(--scroll-track-color);
       border-radius: var(--scroll-bar-border-radius);
       transition: background-color 1s ease-in-out;
+      cursor: pointer;
     }
 
     &::-webkit-scrollbar-thumb{
       background-color: var(--scroll-thumb-color);
       border-radius: var(--scroll-bar-border-radius);
       transition: background-color 1s ease-in-out;
+      cursor: pointer;
     }
     &::-moz-scrollbar-thumb {
       background-color: var(--scroll-thumb-color);
       border-radius: var(--scroll-bar-border-radius);
       transition: background-color 1s ease-in-out;
+      cursor: pointer;
     }
 
     &-invisible{

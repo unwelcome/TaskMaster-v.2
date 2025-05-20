@@ -96,26 +96,26 @@ Table performance{
   score float
 }
 
-Ref group_senior_access: groups.id - senior_access.group_id
+Ref groups_senior_access: groups.id - senior_access.group_id
 
 Ref group_members_users: group_members.user_id > users.id
 Ref group_members_groups: group_members.group_id > groups.id
 
-Ref group_chat: chats.group_id - groups.id
+Ref groups_chat: chats.group_id - groups.id
 
-Ref chat_messages_chat: chat_messages.chat_id > chats.id
-Ref chat_messages_author: chat_messages.author_id > users.id
+Ref chat_messages_chats: chat_messages.chat_id > chats.id
+Ref chat_messages_users: chat_messages.author_id > users.id
 
-Ref seminars_group: seminars.group_id > groups.id
+Ref seminars_groups: seminars.group_id > groups.id
 
 Ref topics_seminars: topics.seminar_id > seminars.id
 
-Ref topic_executors_topic: topic_executors.topic_id > topics.id
-Ref topic_executors_user: topic_executors.user_id > users.id
+Ref topic_executors_topics: topic_executors.topic_id > topics.id
+Ref topic_executors_users: topic_executors.user_id > users.id
 
-Ref topic_files_topic: topic_files.topic_id > topics.id
+Ref topic_files_topics: topic_files.topic_id > topics.id
 
 Ref performance_users: performance.user_id > users.id
 Ref performance_groups: performance.group_id > groups.id
-Ref performance_sseminars: performance.seminar_id > seminars.id
+Ref performance_seminars: performance.seminar_id > seminars.id
 
