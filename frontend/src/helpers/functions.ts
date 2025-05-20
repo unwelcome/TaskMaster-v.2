@@ -23,3 +23,8 @@ export function SET_COOKIE(name: string, value: string, expires: Date) {
 export function GET_USER_AVATAR(userID: number){
   return new URL(`../assets/images/avatar-${(userID % 13) + 1}.png`, import.meta.url).href;
 }
+
+//capitalise first letter
+export function FCapitalize(value: string): string{
+  return value[0].toUpperCase() + value.slice(1);
+}

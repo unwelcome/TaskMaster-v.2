@@ -204,8 +204,12 @@
   .custom-input > input {
     @apply text-lg py-1 bg-transparent grow rounded border-none min-w-0 w-full;
   }
+  .custom-input-error {
+    border-color: var(--color-bad);
+  }
   .custom-input:focus-within {
     outline: 2px solid var(--color-border-focus);
+    border-color: var(--color-border-main);
   }
   .custom-input-slider {
     --on: var(--color-main);

@@ -231,8 +231,13 @@
       @apply text-lg py-1 bg-transparent grow rounded border-none min-w-0 w-full;
     }
 
+    &-error{
+      border-color: var(--color-bad);
+    }
+
     &:focus-within{
       outline: 2px solid var(--color-border-focus);
+      border-color: var(--color-border-main);
     }
 
     &-slider{

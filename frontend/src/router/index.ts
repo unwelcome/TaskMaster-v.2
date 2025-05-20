@@ -34,6 +34,24 @@ const router = createRouter({
           component: () => import('../pages/MainPage/SubPages/TopicsPage/TopicsPage.vue'),
         }
       ]
+    },
+    {
+      path: '/auth',
+      name: 'AuthPage',
+      component: () => import('../pages/AuthPage/AuthPage.vue'),
+      redirect: {name: 'LoginForm'},
+      children: [
+        {
+          path: 'login',
+          name: 'LoginForm',
+          component: () => import('../pages/AuthPage/widgets/loginForm.vue'),
+        },
+        {
+          path: 'signup',
+          name: 'SignUpForm',
+          component: () => import('../pages/AuthPage/widgets/signUpForm.vue'),
+        },
+      ]
     }
   ],
 });

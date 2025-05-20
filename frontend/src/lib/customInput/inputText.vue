@@ -1,9 +1,8 @@
 <template>
   <div class="flex flex-col items-start">
-    <label v-if="inpShowTitle" :class="inpTitleClass" @click="($refs.inputEl as HTMLElement).focus()">{{ inpTitle
-      }}</label>
+    <label v-if="inpShowTitle" :class="inpTitleClass" @click="($refs.inputEl as HTMLElement).focus()">{{ inpTitle }}</label>
 
-    <div class="custom-input" :class="inpInputClass">
+    <div class="custom-input" :class="inpInputClass, {'custom-input-error': inpError !== ''}">
       <input :type=type :placeholder=inpPlaceholder v-model="value" @input="updateValue" ref="inputEl" />
       <div v-if="inpType === 'password'" class="flex flex-col justify-center cursor-pointer">
         <!--Eye Off-->

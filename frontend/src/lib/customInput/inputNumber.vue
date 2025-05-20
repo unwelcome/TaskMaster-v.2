@@ -2,7 +2,7 @@
   <div class="flex flex-col items-start relative">
     <label v-if="inpShowTitle" :class="inpTitleClass" @click="($refs.inputEl as HTMLElement).focus()">{{ inpTitle }}</label>
 
-    <div class="custom-input" :class="inpInputClass">
+    <div class="custom-input" :class="inpInputClass, {'custom-input-error': inpError !== ''}">
       <input 
         type="number" 
         :min="inpMinValue"
