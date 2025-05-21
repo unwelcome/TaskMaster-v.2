@@ -10,7 +10,7 @@ router.get('/health', (req,res) => res.status(200).send('health'));
 router.get('/auth/health', async (req, res) => res.status(200).json({user_id: req.user_id, health: 'health'}));
 
 //Users routes
-router.get('/auth/users', api.usersController.getAllUsers);
+router.get('/users', api.usersController.getAllUsers);
 router.get('/auth/user', api.usersController.getUserInfo);
 router.post('/user/signup', api.usersController.signupUser);
 router.post('/user/login', api.usersController.loginUser);

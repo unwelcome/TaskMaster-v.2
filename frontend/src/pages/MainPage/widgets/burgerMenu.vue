@@ -2,7 +2,7 @@
   <!--Wrapper-->
   <div>
     <!--Blur-->
-    <div class="w-full h-full fixed bg-bg-blur z-10"></div>
+    <div class="w-full h-full fixed bg-bg-blur z-10" @click="$emit('closeBurgerMenu')"></div>
     <!--Burger menu-->
     <div class="flex flex-col gap-2 bg-bg-main h-full w-80 z-20 fixed p-2">
       <!--CLose btn-->
@@ -12,20 +12,21 @@
         </svg>
       </div>
       <!--User profile-->
-      <div class="flex flex-row items-center gap-2 my-4">
+      <div class="flex flex-row items-center gap-2 my-4 cursor-default">
         <div class="w-16 h-16 shrink-0 rounded-full">
-          <img class="w-full h-full" src="@/assets/images/avatar-3.png" alt="avatar"/>
+          <img v-if="getAvatar !== ''" class="w-full h-full" :src="getAvatar" alt="avatar"/>
+          <div v-else class="bg-[#38b97f]"></div>
         </div>
-        <h2 class="text-xl font-medium">Surname Name</h2>
+        <h2 class="text-xl font-medium">{{ userStore.last_name + ' ' + userStore.first_name }}</h2>
       </div>
       <!--Links-->
       <div class="flex flex-col gap-2 grow">
-        <burgerLinkItem :name="'Профиль'">
+        <burgerLinkItem :name="'Профиль'" @click="commingSoon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </burgerLinkItem>
-        <burgerLinkItem :name="'Настройки'">
+        <burgerLinkItem :name="'Настройки'" @click="commingSoon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_11_116)">
               <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,7 +46,7 @@
         </burgerLinkItem>
       </div>
       <!--Logout btn-->
-      <iconButton class="btn-main-bad">
+      <iconButton class="btn-main-bad" @click="logOut">
         <template #icon>
           <svg width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 23.0093H5C4.46957 23.0093 3.96086 22.7784 3.58579 22.3674C3.21071 21.9565 3 21.3991 3 20.8179V5.47841C3 4.89722 3.21071 4.33984 3.58579 3.92888C3.96086 3.51792 4.46957 3.28705 5 3.28705H9M16 18.6265L21 13.1482M21 13.1482L16 7.66976M21 13.1482H9" stroke="#F3F3F3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -60,13 +61,46 @@
 </template>
 <script lang="ts">
 
-import IconButton from '@/shared/iconButton.vue';
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/userStore';
+import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
+
 import burgerLinkItem from '../shared/burgerLinkItem.vue';
+import { GET_USER_AVATAR, SET_COOKIE } from '@/helpers/functions';
 
 export default {
   emits: ['closeBurgerMenu'],
   components: {
     burgerLinkItem,
+  },
+  data() {
+    return{
+      StatusWindowAPI: useStatusWindowAPI(),
+    }
+  },
+  computed: {
+    ...mapStores(useUserStore),
+    getAvatar(){
+      return this.userStore.id !== null ? GET_USER_AVATAR(this.userStore.id) : '';
+    }
+  },
+  methods: {
+    logOut(){
+      SET_COOKIE('access_token', '', new Date(Date.now() + 1));
+
+      this.StatusWindowAPI.createStatusWindow({
+        status: this.StatusWindowAPI.getCodes.success,
+        text: 'Вы вышли из аккаунта!'
+      });
+
+      this.$router.push({name: 'AuthPage'});
+    },
+    commingSoon(){
+      this.StatusWindowAPI.createStatusWindow({
+        status: this.StatusWindowAPI.getCodes.info,
+        text: 'Данная часть функционала находится на стадии разработки. Ожидайте их в ближайших обновлениях!',
+      });
+    }
   }
 }
 </script>

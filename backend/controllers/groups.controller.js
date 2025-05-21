@@ -43,7 +43,7 @@ async function createGroup(req, res){
     const {salt, hash} = passwordFunctions.hashPassword(password);
   
     const dbres = await api.groups.createGroup(title, hash, salt, req.user_id);
-    res.status(201).json({group_id: dbres.group_id});
+    res.status(201).json({id: dbres.group_id});
   }catch(e){
     res.status(400).json({message: 'Create group error'});
   }

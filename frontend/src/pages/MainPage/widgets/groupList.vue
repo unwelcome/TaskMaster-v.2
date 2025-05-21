@@ -17,13 +17,25 @@
   </div>
   <!--Groups list-->
   <div class="flex flex-col gap-2 grow scrollable scrollable-invisible">
-    <groupItem :group-id="1" :group-name="'Фронтенд-бекенд разработка ЭФБО-01-23'" :next-topic="3"/>
-    <groupItem :group-id="1" :group-name="'Фронтенд-бекенд разработка ЭФБО-01-23'"/>
-    <groupItem :group-id="1" :group-name="'Фронтенд-бекенд разработка ЭФБО-01-23'"/>
+    <!-- <groupItem :group-id="1" :group-name="'Фронтенд-бекенд разработка ЭФБО-01-23'" :next-topic="3"/>-->
+    <groupItem 
+      v-for="group of groupList" 
+      :key="group.group_id" 
+      :group-id="group.group_id" 
+      :group-name="group.title"
+    />
+    <!--Заглушка если нет групп-->
+    <div v-if="groupList.length === 0" class="flex flex-col justify-center items-center grow cursor-default gap-4">
+      <p class="text-text-description text-center">Вы не состоите ни в одной группе</p>
+      <p class="text-text-description text-sm text-center">Нажмите на оранжевую кнопку слева сверху и найдите группу либо создайте ее</p>
+    </div>
   </div>
 </div>
 </template>
 <script lang="ts">
+import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
+import { API_GetUserGroups } from '@/api/api';
+import type { IAPIError, IGetUserGroupsAnswer } from '@/helpers/constants';
 
 import searchBar from '@/shared/searchBar.vue';
 import groupItem from '../shared/groupItem.vue';
@@ -33,6 +45,30 @@ export default {
   components: {
     searchBar,
     groupItem,
+  },
+  data(){
+    return{
+      StatusWindowAPI: useStatusWindowAPI(),
+
+      groupList: [] as Array<IGetUserGroupsAnswer>,
+    }
+  },
+  mounted() {
+    this.loadUserGroups();
+  },
+  methods: {
+    loadUserGroups(){
+      API_GetUserGroups()
+      .then((res: Array<IGetUserGroupsAnswer>) => {
+        this.groupList = res;
+      })
+      .catch((err: IAPIError) => {
+        this.StatusWindowAPI.createStatusWindow({
+          status: this.StatusWindowAPI.getCodes.error,
+          text: 'Не удалось получить список ваших групп!'
+        });
+      });
+    }
   }
 
 }
