@@ -19,6 +19,9 @@ router.delete('/user/:id', api.usersController.deleteUser);
 //Groups routes
 router.get('/groups', api.groupsController.getAllGroups);
 router.get('/auth/groups', api.groupsController.getUserGroups);
+router.get('/auth/group/:id', api.groupsController.getGroupInfo);
 router.post('/auth/group/create', api.groupsController.createGroup);
+router.put('/auth/group/:id', api.groupsController.updateGroupSettings);
+router.delete('/auth/group/:id', api.groupsController.deleteGroup);
 
 module.exports = router;
