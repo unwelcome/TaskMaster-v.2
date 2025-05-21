@@ -29,7 +29,9 @@
 </template>
 <script lang="ts">
 
-import type { IValidator } from '@/helpers/constants';
+import { API_PostLogIn } from '@/api/user.api';
+import type { IPostLogIn, IPostLogInAnswer, IValidator } from '@/helpers/constants';
+import { SET_COOKIE } from '@/helpers/functions';
 import { ValidUserEmail, ValidUserPassword } from '@/helpers/validator';
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
 
@@ -47,11 +49,29 @@ export default {
   methods: {
     initLogIn(){
       if(this.emailInput.error === '' && this.passwordInput.error === ''){
-        const body = {
-
+        const body:IPostLogIn = {
+          email: this.emailInput.value,
+          password: this.passwordInput.value
         }
 
-        //API
+        API_PostLogIn(body)
+        .then((res: IPostLogInAnswer) => {
+          SET_COOKIE('access_token', res.access_token, new Date(Date.now() + 1000 * 60 * 60 * 24 * 4));
+
+          this.StatusWindowAPI.createStatusWindow({
+            status: this.StatusWindowAPI.getCodes.success,
+            text: 'Вы успешно вошли в аккаунт!'
+          });
+
+          this.$router.push({name: 'MainPage'});
+        })
+        .catch(err => {
+          this.StatusWindowAPI.createStatusWindow({
+            status: this.StatusWindowAPI.getCodes.error,
+            text: 'Не удалось войти в аккаунт, пожалуйста, попробуйте позже!',
+            time: 5000
+          });
+        })
       }
     },
     validateInput(value: string, type: string){

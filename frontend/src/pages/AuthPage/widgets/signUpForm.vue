@@ -79,8 +79,10 @@
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
 
 import paginator from '../features/paginator.vue';
-import type { IValidator } from '@/helpers/constants';
+import type { IAPIError, IPostLogIn, IPostLogInAnswer, IPostSignUp, IPostSignUpAnswer, IValidator } from '@/helpers/constants';
 import { ValidUserEmail, ValidUserPassword, ValidUserFirstName, ValidUserLastName, ValidUserMiddleName } from '@/helpers/validator';
+import { API_PostLogIn, API_PostSignUp } from '@/api/api';
+import { SET_COOKIE } from '@/helpers/functions';
 
 export default {
   components:{
@@ -123,10 +125,46 @@ export default {
         this.lastNameInput.error === '' && 
         this.middleNameInput.error === ''
       ){
-        const body = {
-
+        const body:IPostSignUp = {
+          email: this.emailInput.value,
+          password: this.passwordInput.value,
+          last_name: this.lastNameInput.value,
+          first_name: this.firstNameInput.value,
+          middle_name: this.middleNameInput.value,
+          avatar_url: '',
         }
-        //API
+        API_PostSignUp(body)
+        .then((res: IPostSignUpAnswer) => {
+          const loginBody:IPostLogIn = {
+            email: body.email,
+            password: body.password
+          }
+          API_PostLogIn(loginBody)
+          .then((response: IPostLogInAnswer) => {
+            SET_COOKIE('access_token', response.access_token, new Date(Date.now() + 1000 * 60 * 60 * 24 * 4));
+
+            this.StatusWindowAPI.createStatusWindow({
+              status: this.StatusWindowAPI.getCodes.success,
+              text: 'Вы успешно вошли в аккаунт!'
+            });
+
+            this.$router.push({name: 'MainPage'});
+          })
+          .catch(err => {
+            this.StatusWindowAPI.createStatusWindow({
+              status: this.StatusWindowAPI.getCodes.error,
+              text: 'Не удалось войти в аккаунт, пожалуйста, попробуйте позже!',
+              time: 5000
+            });
+          })
+        })
+        .catch((err: IAPIError) => {
+          this.StatusWindowAPI.createStatusWindow({
+            status: this.StatusWindowAPI.getCodes.error,
+            text: 'Не удалось создать в аккаунт, пожалуйста, попробуйте позже!',
+            time: 5000
+          });
+        })
       }
     },
     validateInput(value: string, type: string){
@@ -134,7 +172,7 @@ export default {
         case 'email': this.emailInput = ValidUserEmail(value); break;
         case 'password': this.passwordInput = ValidUserPassword(value); break;
         case 'firstName': this.firstNameInput = ValidUserFirstName(value); break;
-        case 'secondName': this.lastNameInput = ValidUserLastName(value); break;
+        case 'lastName': this.lastNameInput = ValidUserLastName(value); break;
         case 'middleName': this.middleNameInput = ValidUserMiddleName(value); break;
       }
     },

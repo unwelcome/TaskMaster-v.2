@@ -1,6 +1,7 @@
 const express = require('express');
 require('dotenv').config({path: '../.env'})
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const router = require('./routers/router.js');
 
 const app = express();
@@ -16,6 +17,8 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 //   user: ${process.env.POSTGRES_USER},\n
 //   password: ${process.env.POSTGRES_PASSWORD}`);
 
+//Middleware CORS
+app.use(cors());
 // Middleware для парсинга JSON
 app.use(bodyParser.json());
 
