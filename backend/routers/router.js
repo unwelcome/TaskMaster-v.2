@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database');
+const api = require('../controllers/api.controller');
 
-router.get('/health', (req,res) => {
-  res.status(200).json({status: 'health'});
-})
+router.get('/health', (req,res) => res.status(200).send('health'));
 
-router.get('/db/health', async(req,res) => {
-  const users = await db.getAllUsers();
-  res.status(200).json( users);
-})
+//User routes
+router.get('/users', api.userController.getAllUsers);
+router.post('/user/signup', api.userController.signupUser);
+router.post('/user/login', api.userController.loginUser);
+router.delete('/user/:id', api.userController.deleteUser);
+
+//Check Authentication
+router.use('/auth', api.authController.checkAuth);
+
+router.get('/auth/health', async (req, res) => res.status(200).json({user_id: req.user_id, health: 'health'}))
 
 module.exports = router;

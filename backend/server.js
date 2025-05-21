@@ -1,14 +1,20 @@
 const express = require('express');
-require('dotenv').config()
+require('dotenv').config({path: '../.env'})
 const bodyParser = require('body-parser');
 const router = require('./routers/router.js');
-// const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Проверка NODE_ENV
 console.log('NODE_ENV:', process.env.NODE_ENV);
+// console.log(`
+//   SERVER:
+//   host: ${process.env.NODE_ENV === 'production' ? process.env.POSTGRES_HOST : 'localhost'},\n
+//   port: ${process.env.POSTGRES_PORT},\n
+//   database: ${process.env.POSTGRES_DB},\n
+//   user: ${process.env.POSTGRES_USER},\n
+//   password: ${process.env.POSTGRES_PASSWORD}`);
 
 // Middleware для парсинга JSON
 app.use(bodyParser.json());
@@ -20,17 +26,6 @@ app.use((req, res, next) => {
 
 //роутинг  
 app.use('/api', router);
-
-// // Отдача статики (собранного фронтенда)
-// if (process.env.NODE_ENV === 'production') {
-//   const frontendPath = path.join(__dirname, '../frontend/dist');
-//   app.use(express.static(frontendPath));
-
-//   // Все остальные запросы отправляем на index.html
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.join(frontendPath, 'index.html'));
-//   });
-// }
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
