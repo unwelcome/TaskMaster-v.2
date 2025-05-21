@@ -1,8 +1,10 @@
 const authController = require('./auth.controller');
-const userController = require('./users.controller');
+const usersController = require('./users.controller');
+const groupsController = require('./groups.controller');
 
 
 module.exports = {
   authController: authController,
-  userController: userController,
+  usersController: usersController,
+  groupsController: groupsController,
 }

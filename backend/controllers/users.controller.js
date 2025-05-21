@@ -1,6 +1,6 @@
-const crypto = require('node:crypto');
-const jwt = require('jsonwebtoken');
 const api = require('../db/api.db');
+const jwt = require('../helpers/jwtFunctions');
+const passwordFunctions = require('../helpers/passwordFunctions');
 
 //ROUTES
 
@@ -32,7 +32,7 @@ async function getUserInfo(req, res){
 async function signupUser(req, res){
   try{
     const {email, password, last_name, first_name, middle_name, avatar_url} = req.body;
-    const {salt, hash} = hashPassword(password);
+    const {salt, hash} = passwordFunctions.hashPassword(password);
 
     const dbres = await api.users.createUser(
       hash, 
@@ -58,7 +58,7 @@ async function loginUser(req, res){
   
     const dbres = await api.users.getUserHashAndSalt(email);
   
-    if(checkPassword(password, dbres.password_hash, dbres.password_salt)){
+    if(passwordFunctions.checkPassword(password, dbres.password_hash, dbres.password_salt)){
       const payload = {
         user_id: dbres.id
       };
@@ -67,7 +67,7 @@ async function loginUser(req, res){
         expiresIn: 60 * 60 * 24 * 4,
         algorithm: 'HS256',   // Алгоритм подписи
       };
-
+      
       // Создаем токен
       new Promise((resolve, reject) => {
         jwt.sign(payload, secretKey, options, (err, token) => {
@@ -104,22 +104,6 @@ async function deleteUser(req, res){
   }catch(e){
     res.send(400).json({message: 'Delete user error'});
   }
-}
-
-//FUNCTIONS
-
-function hashPassword(password, _salt=null){
-  const salt = (_salt === null) ? crypto.randomBytes(128).toString('base64') : _salt;
-  const iterations = 10;
-  const hash = crypto.pbkdf2Sync(password, salt, iterations, 128, 'sha512').toString('base64');
-
-  return {salt: salt, hash: hash};
-}
-
-function checkPassword(password, passwordHash, passwordSalt){
-  const {salt, hash} = hashPassword(password, passwordSalt);
-
-  return hash === passwordHash;
 }
 
 //EXPORT
