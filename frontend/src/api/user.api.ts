@@ -1,28 +1,33 @@
 import axios from "axios";
-import { API, DEVMODE, type IAPIError, type IPostLogIn, type IPostLogInAnswer, type IPostSignUp, type IPostSignUpAnswer } from "@/helpers/constants";
+import { API, DEVMODE, 
+  type IAPIError, 
+  type IGetUserInfoAnswer, 
+  type IPostLogIn, type IPostLogInAnswer, 
+  type IPostSignUp, type IPostSignUpAnswer 
+} from "@/helpers/constants";
 import { GET_COOKIE } from "@/helpers/functions";
 
 
 //GET//
 
-//Get profile info
-// export function API_GetProfileInfo(){
-//   return new Promise((resolve, reject) => {
-//     axios.get(`${API}/auth/profile`,  {
-//       headers: {
-//         Authorization: 'Bearer ' + GET_COOKIE('access_token'),
-//       }
-//      })
-//     .then(response => {
-//       if(DEVMODE) console.log('Get Profile info success: ', response);
-//       resolve(response);
-//     })
-//     .catch(error => {
-//       if(DEVMODE) console.log('Get Profile info error: ', error);
-//       reject(error);
-//     })
-//   });
-// };
+// Get user info
+export function API_GetUserInfo(): Promise<IGetUserInfoAnswer | any>{
+  return new Promise((resolve, reject) => {
+    axios.get(`${API}/auth/user`,  {
+      headers: {
+        Authorization: 'Bearer ' + GET_COOKIE('access_token'),
+      }
+     })
+    .then(response => {
+      if(DEVMODE) console.log('Get User info success: ', response);
+      resolve(response.data as IGetUserInfoAnswer);
+    })
+    .catch(error => {
+      if(DEVMODE) console.log('Get User info error: ', error);
+      reject(error.response.data as IAPIError);
+    })
+  });
+};
 
 //POST//
 

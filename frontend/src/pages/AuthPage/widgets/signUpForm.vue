@@ -75,7 +75,8 @@
 
 </template>
 <script lang="ts">
-
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/userStore';
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
 
 import paginator from '../features/paginator.vue';
@@ -101,6 +102,9 @@ export default {
       lastNameInput: {value: '', error: ''} as IValidator<string>,
       middleNameInput: {value: '', error: ''} as IValidator<string>,
     }
+  },
+  computed: {
+    ...mapStores(useUserStore),
   },
   methods: {
     goToPage(page: number){
@@ -148,6 +152,8 @@ export default {
               text: 'Вы успешно вошли в аккаунт!'
             });
 
+            //Обнуляем факт авторизации, чтобы роутер заново подсосал данные с сервера
+            this.userStore.isAuthorized = null;
             this.$router.push({name: 'MainPage'});
           })
           .catch(err => {

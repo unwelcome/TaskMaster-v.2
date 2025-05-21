@@ -10,6 +10,14 @@ export interface IAPIError{
   message: string,
 }
 
+export interface IGetUserInfoAnswer{
+  id: number,
+  first_name: string,
+  last_name: string,
+  middle_name: string,
+  avatar_url: string,
+}
+
 export interface IPostSignUp{
   email: string,
   password: string,

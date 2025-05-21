@@ -12,10 +12,7 @@ async function checkAuth(req, res, next) {
       if(err){
         return res.status(403).json({message: 'Wrong auth token'});
       }
-  
-      console.log('payload: ', payload);
-      req.user_id = payload.user_id;
-      
+      req.user_id = payload.user_id;      
       next();
     });
   }catch(e){

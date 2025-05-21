@@ -29,11 +29,13 @@
 </template>
 <script lang="ts">
 
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/userStore';
 import { API_PostLogIn } from '@/api/user.api';
-import type { IPostLogIn, IPostLogInAnswer, IValidator } from '@/helpers/constants';
 import { SET_COOKIE } from '@/helpers/functions';
 import { ValidUserEmail, ValidUserPassword } from '@/helpers/validator';
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
+import type { IPostLogIn, IPostLogInAnswer, IValidator } from '@/helpers/constants';
 
 export default {
   components:{
@@ -45,6 +47,9 @@ export default {
       emailInput: {value: '', error: ''} as IValidator<string>,
       passwordInput: {value: '', error: ''} as IValidator<string>,
     }
+  },
+  computed: {
+    ...mapStores(useUserStore),
   },
   methods: {
     initLogIn(){
@@ -63,6 +68,8 @@ export default {
             text: 'Вы успешно вошли в аккаунт!'
           });
 
+          //Обнуляем факт авторизации, чтобы роутер заново подсосал данные с сервера
+          this.userStore.isAuthorized = null;
           this.$router.push({name: 'MainPage'});
         })
         .catch(err => {

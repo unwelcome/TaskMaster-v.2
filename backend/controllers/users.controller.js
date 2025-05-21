@@ -13,6 +13,22 @@ async function getAllUsers(req, res){
   }
 }
 
+async function getUserInfo(req, res){
+  try{
+    const dbres = await api.users.getUserById(req.user_id);
+
+    res.status(200).json({
+      id: dbres.id,
+      first_name: dbres.first_name,
+      last_name: dbres.last_name,
+      middle_name: dbres.middle_name,
+      avatar_url: dbres.avatar_url,
+    });
+  }catch(e){
+    res.send(400).json({message: 'Get user info error'});
+  }
+}
+
 async function signupUser(req, res){
   try{
     const {email, password, last_name, first_name, middle_name, avatar_url} = req.body;
@@ -110,6 +126,7 @@ function checkPassword(password, passwordHash, passwordSalt){
 
 module.exports = {
   getAllUsers,
+  getUserInfo,
   signupUser,
   loginUser,
   deleteUser,
