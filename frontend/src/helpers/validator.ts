@@ -11,7 +11,6 @@ export function ValidUserEmail(value: string): IValidator<string>{
   return {value: value, error: ''}
 }
 
-
 //validate userPassword
 export function ValidUserPassword(value: string): IValidator<string>{
   // if(value.match(/^[a-zA-Z0-9-]+$/) === null){
@@ -83,4 +82,45 @@ export function ValidUserMiddleName(value: string): IValidator<string>{
     
   }
   return {value: FCapitalize(value.toLowerCase()), error: ''}
+}
+
+//validate group name
+export function ValidGroupName(value: string): IValidator<string>{
+  if(value.match(/^[а-яА-Яa-zA-ZёЁ0-9\.\-\_\s\(\)\!\№\#\"\'\[\]\:\,]+$/) === null){
+    return {value: FCapitalize(value), error: 'Некорректное название группы!'};
+  }
+  if(value.length < 2){
+    return {value: FCapitalize(value), error: 'Очень короткое название!'};
+  }
+  if(value.length > 30){
+    return {value: FCapitalize(value), error: 'Очень длинное название!'};
+  }
+  return {value: FCapitalize(value), error: ''}
+}
+
+//validate group password
+export function ValidGroupPassword(value: string): IValidator<string>{
+  // if(value.match(/^[a-zA-Z0-9-]+$/) === null){
+  //   return {value: value, error: 'Некорректные символы в пароле!'};
+  // }
+  // if(value.match(/[a-zA-Z]+/) === null){
+  //   return {value: value, error: 'Пароль должен соджержать латинские буквы'};
+  // }
+  // if(value.match(/[a-z]+/) === null){
+  //   return {value: value, error: 'Пароль должен сожержать строчную букву!'};
+  // }
+  // if(value.match(/[A-Z]+/) === null){
+  //   return {value: value, error: 'Пароль должен сожержать прописную букву!'};
+  // }
+  // if(value.match(/[0-9]+/) === null){
+  //   return {value: value, error: 'Пароль должен содержать число!'};
+  // }
+  // if(value.length < 8){
+  if(value.length < 4){
+    return {value: value, error: 'Пароль слишком короткий!'};
+  }
+  if(value.length > 50){
+    return {value: value, error: 'Пароль слишком длинный!'};
+  }
+  return {value: value, error: ''};
 }

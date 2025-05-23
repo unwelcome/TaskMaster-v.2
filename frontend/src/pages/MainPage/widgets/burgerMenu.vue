@@ -34,12 +34,12 @@
             </g>
           </svg>
         </burgerLinkItem>
-        <burgerLinkItem :name="'Создать группу'">
+        <burgerLinkItem :name="'Создать группу'" @click="showCreateGroupWindow = true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 8V16M8 12H16M5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </burgerLinkItem>
-        <burgerLinkItem :name="'Найти группу'">
+        <burgerLinkItem :name="'Найти группу'" @click="showSearchGroupWindow = true">
           <svg width="23" height="24" viewBox="0 0 23 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M20.1053 21L15.9406 16.65M18.1905 11C18.1905 15.4183 14.7614 19 10.5313 19C6.30131 19 2.87219 15.4183 2.87219 11C2.87219 6.58172 6.30131 3 10.5313 3C14.7614 3 18.1905 6.58172 18.1905 11Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -57,6 +57,12 @@
         </template>
       </iconButton>
     </div>
+    <Transition name="fade">
+      <createGroup v-show="showCreateGroupWindow" @close-window="showCreateGroupWindow = false" @created-group="closeAll"/>
+    </Transition>
+    <Transition name="fade">
+      <searchGroup v-show="showSearchGroupWindow" @close-window="showSearchGroupWindow = false"/>
+    </Transition>
   </div>
 </template>
 <script lang="ts">
@@ -64,18 +70,25 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
+import { GET_USER_AVATAR, SET_COOKIE } from '@/helpers/functions';
 
 import burgerLinkItem from '../shared/burgerLinkItem.vue';
-import { GET_USER_AVATAR, SET_COOKIE } from '@/helpers/functions';
+import createGroup from './createGroup.vue';
+import searchGroup from './searchGroup.vue';
 
 export default {
   emits: ['closeBurgerMenu'],
   components: {
     burgerLinkItem,
+    createGroup,
+    searchGroup,
   },
   data() {
     return{
       StatusWindowAPI: useStatusWindowAPI(),
+
+      showCreateGroupWindow: false,
+      showSearchGroupWindow: false,
     }
   },
   computed: {
@@ -100,6 +113,12 @@ export default {
         status: this.StatusWindowAPI.getCodes.info,
         text: 'Данная часть функционала находится на стадии разработки. Ожидайте их в ближайших обновлениях!',
       });
+    },
+    closeAll(groupID: number){
+      this.showCreateGroupWindow = false;
+      this.showSearchGroupWindow = false;
+      this.$emit('closeBurgerMenu');
+      // this.$router.push({name: 'MainPage', params: {id: groupID}});
     }
   }
 }

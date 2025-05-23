@@ -35,7 +35,7 @@
 <script lang="ts">
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
 import { API_GetUserGroups } from '@/api/api';
-import type { IAPIError, IGetUserGroupsAnswer } from '@/helpers/constants';
+import type { IGetUserGroupsAnswer } from '@/helpers/constants';
 
 import searchBar from '@/shared/searchBar.vue';
 import groupItem from '../shared/groupItem.vue';
@@ -62,7 +62,7 @@ export default {
       .then((res: Array<IGetUserGroupsAnswer>) => {
         this.groupList = res;
       })
-      .catch((err: IAPIError) => {
+      .catch(err => {
         this.StatusWindowAPI.createStatusWindow({
           status: this.StatusWindowAPI.getCodes.error,
           text: 'Не удалось получить список ваших групп!'

@@ -44,19 +44,3 @@ export default {
   }
 }
 </script>
-<style>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity .05s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 50%;
-}
-
-.fade-enter-to,
-.fade-leave-from{
-  opacity: 1;
-}
-</style>
