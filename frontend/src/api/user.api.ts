@@ -24,7 +24,7 @@ export function API_GetUserInfo(): Promise<IGetUserInfoAnswer | any>{
     })
     .catch(error => {
       if(DEVMODE) console.log('Get User info error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };
@@ -41,7 +41,7 @@ export function API_PostSignUp(body: IPostSignUp): Promise<IPostSignUpAnswer | a
     })
     .catch(error => {
       if(DEVMODE) console.log('SignUp user error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };
@@ -56,7 +56,7 @@ export function API_PostLogIn(body: IPostLogIn): Promise<IPostLogInAnswer | any>
     })
     .catch(error => {
       if(DEVMODE) console.log('LogIn user error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };

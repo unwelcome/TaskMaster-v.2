@@ -25,7 +25,7 @@ export function API_GetUserGroups(): Promise<Array<IGetUserGroupsAnswer> | any>{
     })
     .catch(error => {
       if(DEVMODE) console.log('Get user groups error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };
@@ -44,7 +44,7 @@ export function API_GetGroupInfo(groupID: number): Promise<IGetGroupInfoAnswer |
     })
     .catch(error => {
       if(DEVMODE) console.log('Get group info error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };
@@ -65,7 +65,7 @@ export function API_PostGroupCreate(data: IPostGroupCreate): Promise<IPostGroupC
     })
     .catch(error => {
       if(DEVMODE) console.log('Create group error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };
