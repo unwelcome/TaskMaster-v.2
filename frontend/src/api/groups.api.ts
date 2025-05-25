@@ -86,7 +86,7 @@ export function API_PutGroupSettings(groupID: number, data: IPutGroupSettings): 
     })
     .catch(error => {
       if(DEVMODE) console.log('Update group settings error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };
@@ -107,7 +107,7 @@ export function API_DeleteGroup(groupID: number): Promise<IDeleteGroupAnswer | a
     })
     .catch(error => {
       if(DEVMODE) console.log('Delete group error: ', error);
-      reject(error.response.data as IAPIError);
+      reject(error);
     })
   });
 };

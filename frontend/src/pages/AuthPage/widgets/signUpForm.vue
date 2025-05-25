@@ -78,12 +78,12 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
 import { useStatusWindowAPI } from '@/lib/StatusWindow/statusWindowAPI';
+import { SET_COOKIE } from '@/helpers/functions';
+import { API_PostLogIn, API_PostSignUp } from '@/api/api';
+import type { IPostLogIn, IPostLogInAnswer, IPostSignUp, IPostSignUpAnswer, IValidator } from '@/helpers/constants';
+import { ValidUserEmail, ValidUserPassword, ValidUserFirstName, ValidUserLastName, ValidUserMiddleName } from '@/helpers/validator';
 
 import paginator from '../features/paginator.vue';
-import type { IAPIError, IPostLogIn, IPostLogInAnswer, IPostSignUp, IPostSignUpAnswer, IValidator } from '@/helpers/constants';
-import { ValidUserEmail, ValidUserPassword, ValidUserFirstName, ValidUserLastName, ValidUserMiddleName } from '@/helpers/validator';
-import { API_PostLogIn, API_PostSignUp } from '@/api/api';
-import { SET_COOKIE } from '@/helpers/functions';
 
 export default {
   components:{
@@ -164,7 +164,7 @@ export default {
             });
           })
         })
-        .catch((err: IAPIError) => {
+        .catch(err => {
           this.StatusWindowAPI.createStatusWindow({
             status: this.StatusWindowAPI.getCodes.error,
             text: 'Не удалось создать в аккаунт, пожалуйста, попробуйте позже!',
