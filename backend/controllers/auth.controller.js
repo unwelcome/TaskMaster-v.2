@@ -10,14 +10,17 @@ async function checkAuth(req, res, next) {
   
     jwt.verify(token, secretKey, (err, payload) => {
       if(err){
-        return res.status(403).json({message: 'Wrong auth token'});
+        switch(err.name){
+          case 'TokenExpiredError': return res.status(401).json({ message: 'Token expired' });
+          default: res.status(401).json({ message: 'Wrong auth token' });
+        }
       }
       req.user_id = payload.user_id;      
       next();
     });
   }catch(e){
     console.log('Auth error: ', e);
-    res.status(400).json('Auth error');
+    res.status(401).json({message: 'Auth error'});
   }
 }
 

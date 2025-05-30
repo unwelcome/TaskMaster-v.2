@@ -26,6 +26,8 @@ router.post('/auth/group/create', api.groupsController.createGroup);
 router.put('/auth/group/:id', api.groupsController.updateGroupSettings);
 router.delete('/auth/group/:id', api.groupsController.deleteGroup);
 
+module.exports = router;
+
 //Test redis request
 router.get('/redis', async(req, res) => {
   redis.get('my-key').then((result) => {
@@ -43,5 +45,3 @@ router.post('/redis', async(req, res) => {
     res.status(400).send('Smth went wrong while set data in redis');
   }
 });
-
-module.exports = router;

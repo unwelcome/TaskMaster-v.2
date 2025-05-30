@@ -9,13 +9,6 @@ const PORT = process.env.PORT || 8080;
 
 // Проверка NODE_ENV
 console.log('NODE_ENV:', process.env.NODE_ENV);
-// console.log(`
-//   SERVER:
-//   host: ${process.env.NODE_ENV === 'production' ? process.env.POSTGRES_HOST : 'localhost'},\n
-//   port: ${process.env.POSTGRES_PORT},\n
-//   database: ${process.env.POSTGRES_DB},\n
-//   user: ${process.env.POSTGRES_USER},\n
-//   password: ${process.env.POSTGRES_PASSWORD}`);
 
 //Middleware CORS
 app.use(cors());
