@@ -46,7 +46,7 @@ async function signupUser(req, res){
     res.status(201).json({id: dbres.id});
   }catch(e){
     //Same email error
-    if(err.constraint === 'users_email_key') res.status(400).json({message: 'Email is already exists'});
+    if(e.constraint === 'users_email_key') res.status(400).json({message: 'Email is already exists'});
     //Other errors
     else res.status(400).json({message: 'Create user error'});
   }
