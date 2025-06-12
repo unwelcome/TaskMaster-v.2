@@ -1,16 +1,10 @@
 import { Router, Request, Response } from "express";
 import { logsController } from "./infractructure/controllers/logsController";
-
-import { UserController } from "./infractructure/controllers/userController";
-import { UserService } from "./core/services/userService/userService";
-import { UserRepositoryImpl } from "./infractructure/db/repositories/UserRepositoryImpl";
+import { getUserController } from "./infractructure/factories/userFactory";
 
 const router = Router();
 
-const userRepositoryPostgresql: UserRepositoryImpl = new UserRepositoryImpl();
-const userService: UserService = new UserService(userRepositoryPostgresql);
-const userController: UserController = new UserController(userService);
-
+const userController = getUserController();
 
 //Logs
 router.use('/', logsController);
