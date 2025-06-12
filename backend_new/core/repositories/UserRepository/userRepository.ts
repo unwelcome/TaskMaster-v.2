@@ -7,7 +7,7 @@ export interface UserRepository{
   create(dto: CreateUserRepositoryDto): Promise<User>,
   
   getAll(): Promise<User[]>,
-  getAllByGroupId(group_id: number): Promise<User[]>,
+  getAllByGroupId(group_id: number): Promise<User[]>, // remove to groupRepository
   getById(id: number): Promise<User | undefined>,
   getByEmail(email: string): Promise<User | undefined>,
 

@@ -61,7 +61,7 @@ export class UserRepositoryImpl implements UserRepository{
 
   async updatePassword(dto: UpdateUserPasswordRepositoryDto): Promise<User> {
     try{
-      const result = await db.query('UPDATE users SET password_hash = $2, password_salt = $3 WHERE id = $1', [dto.id, dto.password_hash, dto.password_salt]);
+      const result = await db.query('UPDATE users SET password_hash = $2, password_salt = $3 WHERE id = $1 RETURNING *', [dto.id, dto.password_hash, dto.password_salt]);
       if(result.rowCount === 0) throw new UserNotFoundError(dto.id);
       return result.rows[0];
     }catch(err){

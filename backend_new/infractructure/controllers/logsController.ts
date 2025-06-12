@@ -16,6 +16,6 @@ export function logsController(req: Request, res: Response, next: NextFunction){
 
   const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 
-  console.log(`Request #${++RequestsArray.count}: time: ${formattedDate}; type: ${req.method}; path: ${req.path}; params: ${JSON.stringify(req.params)}; query: ${JSON.stringify(req.query)}; body: ${JSON.stringify(req?.body)}`);
+  console.log(`Request #${++RequestsArray.count}: time: ${formattedDate}; type: ${req.method}; path: ${req.path}; body: ${JSON.stringify(req?.body)}`);
   next();
 }

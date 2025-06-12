@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserService } from "../../core/services/userService/userService";
-import { CreateUserServiceDto } from "../../core/services/userService/userService.dto";
-import { UserAlreadyExistsError } from '../../core/errors/userErrors';
+import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
+import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from '../../core/errors/userErrors';
 import { ErrorCode } from '../../core/errors/errorCodes';
 import { UserFieldsConfig } from '../../common/fieldsConfig';
 
@@ -117,12 +117,72 @@ export class UserController {
     }
   }
 
-  async getAllUsers(req: Request, res: Response): Promise<void>{
+  async loginUser(req: Request, res: Response): Promise<void>{
     try{
-      const users = await this.userService.getAll();
+      const { email, password } = req.body as { email: string, password: string };
 
-      res.status(200).json(users);
-    }catch(e){
+      //Exists required fields
+      if(!email || !password){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields', 
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      //Email validation
+      if(email.length < UserFieldsConfig.EMAIL_MIN_LENGTH || email.length > UserFieldsConfig.EMAIL_MAX_LENGTH){
+        res.status(422).json({
+          error:{
+            message: 'Invalid email',
+            code: ErrorCode.INVALID_EMAIL_FORMAT
+          }
+        });
+        return;
+      }
+
+      //Password validation
+      if(password.length < UserFieldsConfig.PASSWORD_MIN_LENGTH || password.length > UserFieldsConfig.PASSWORD_MAX_LENGTH){
+        res.status(422).json({
+          error:{
+            message: 'Invalid user password',
+            code: ErrorCode.INVALID_USER_PASSWORD_FORMAT
+          }
+        });
+        return;
+      }
+
+      //Make Dto
+      const loginUserServiceDto: LoginUserServiceDto = {
+        email: email,
+        password: password,
+      }
+
+      //Check password correct
+      const isLoginCorrect = await this.userService.login(loginUserServiceDto);
+
+      if(isLoginCorrect) res.status(200).json({access_token: 'ACCESS_TOKEN'}); // Correct password -> redirect to token gain route
+      else res.status(403).json({ // Wrong password
+          error: {
+            message: 'Wrong password',
+            code: ErrorCode.WRONG_PASSWORD
+          }
+        });
+
+      return;
+    }catch(err){
+      if(err instanceof UserNotFoundByEmailError){
+        res.status(404).json({
+          error:{
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+
       res.status(500).json({
         error:{
           message: "Internal server error",
@@ -131,4 +191,230 @@ export class UserController {
       });
     }
   }
+
+  async getAllUsers(req: Request, res: Response): Promise<void>{
+    try{
+      const users = await this.userService.getAll();
+
+      res.status(200).json(users);
+    }catch(err){
+      res.status(500).json({
+        error:{
+          message: "Internal server error",
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async getAllUsersByGroupId(req: Request, res: Response): Promise<void>{ // remove to groupController
+    try{
+      const { group_id } = req.params as { group_id: string };
+
+      if(!group_id){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields', 
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const number_group_id = parseInt(group_id);
+
+      if(isNaN(number_group_id) || number_group_id < 0){
+        res.status(400).json({
+          error:{
+            message: 'Invalid group id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      const users = await this.userService.getByGroupId(number_group_id);
+
+      if(users.length === 0){
+        res.status(404).json({
+          error:{
+            message: 'Group users list is empty',
+            code: ErrorCode.UNEXPECTED_ERROR
+          }
+        });
+        return;
+      }
+
+      res.status(200).json(users);
+    }catch(err){
+      res.status(500).json({
+        error:{
+          message: "Internal server error",
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async getUserById(req: Request, res: Response): Promise<void>{
+    try{
+      const { id } = req.params as { id: string };
+
+      if(!id){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields', 
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const numberID = parseInt(id);
+
+      if(isNaN(numberID) || numberID < 0){
+        res.status(400).json({
+          error:{
+            message: 'Invalid user id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      const user = await this.userService.getById(numberID);
+      res.status(200).json(user);
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+      return;
+    }
+  }
+
+  async getUserByEmail(req: Request, res: Response): Promise<void>{
+    try{
+      const { email } = req.body as { email: string };
+  
+      if(!email){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields', 
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const user = await this.userService.getByEmail(email);
+      res.status(200).json(user);
+    }catch(err){
+      if(err instanceof UserNotFoundByEmailError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+      res.status(500).json({
+        error:{
+          message: "Internal server error",
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async updateUserPassword(req: Request, res: Response): Promise<void>{
+    try{
+      const { id } = req.params as { id: string };
+      const { password } = req.body as { password: string };
+
+      //Exists required fields
+      if(!id || !password){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields',
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const number_id = parseInt(id);
+
+      //Validate id as number
+      if(isNaN(number_id) || number_id < 0){
+        res.status(422).json({
+          error: {
+            message: 'Invalid user id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      //Validate password
+      if(password.length < UserFieldsConfig.PASSWORD_MIN_LENGTH || password.length > UserFieldsConfig.PASSWORD_MAX_LENGTH){
+        res.status(422).json({
+          error: {
+            message: 'Invalid password',
+            code: ErrorCode.INVALID_USER_PASSWORD_FORMAT
+          }
+        });
+        return;
+      }
+
+      const updateUserPasswordServiceDto: UpdateUserPasswordServiceDto = {
+        id: number_id,
+        password: password
+      }
+
+      const newUser = await this.userService.updatePassword(updateUserPasswordServiceDto);
+      res.status(200).json(newUser);
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+      if(err instanceof UserNotChangedError){
+        res.status(304).json({
+          error: {
+            message: 'Nothing changed',
+            code: ErrorCode.NOTHING_CHANGED
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  } 
+
+  
 }

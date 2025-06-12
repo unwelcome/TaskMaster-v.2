@@ -6,6 +6,7 @@ export const enum ErrorCode {
   INVALID_TOKEN = "INVALID_TOKEN",                // Неверный токен
   TOKEN_EXPIRED = "TOKEN_EXPIRED",                // Срок действия токена истек
   NOT_ENOUGH_RIGHTS = "NOT_ENOUGH_RIGHTS",        // Недостаточно прав
+  WRONG_PASSWORD = "WRONG_PASSWORD",              // Неверный пароль пользователя
 
   // Валидация данных
   INVALID_EMAIL_FORMAT = "INVALID_EMAIL_FORMAT",                  // Неверный формат email
@@ -21,6 +22,7 @@ export const enum ErrorCode {
   NOT_IMPLEMENTED = "NOT_IMPLEMENTED",              // Функция еще не реализована
   UNEXPECTED_ERROR = "UNEXPECTED_ERROR",            // Непредвиденная ошибка
   DATABASE_ERROR = "DATABASE_ERROR",                // Непредвиденная ошибка при запросе к бд
+  NOTHING_CHANGED = "NOTHING_CHANGED",              // Без изменений
 }
 
 export const ErrorMessages = {
@@ -43,6 +45,9 @@ export const ErrorMessages = {
   NOT_ENOUGH_RIGHTS: {
     ru: 'Недостаточно прав для выполнения действия'
   },
+  WRONG_PASSWORD: {
+    ru: 'Неверный пароль'
+  },
 
   // Валидация данных
   INVALID_EMAIL_FORMAT: {
@@ -60,8 +65,6 @@ export const ErrorMessages = {
   INVALID_MIDDLE_NAME_FORMAT: {
     ru: 'Неверное отчество пользователя'
   },
-
-  // Другие ошибки
   MISSING_REQUIRED_FIELD: {
     ru: 'Отсутствует обязательное поле'
   },
@@ -69,10 +72,20 @@ export const ErrorMessages = {
     ru: 'Неверные данные'
   },
 
+  // Другие ошибки
   INTERNAL_SERVER_ERROR: {
     ru: 'Внутренняя ошибка сервера'
   },
   NOT_IMPLEMENTED: {
     ru: 'Функция находится на стадии разработки'
+  },
+  UNEXPECTED_ERROR: {
+    ru: 'Непредвиденная ошибка'
+  },
+  DATABASE_ERROR: {
+    ru: 'Неудалось подключиться к базе данных'
+  },
+  NOTHING_CHANGED: {
+    ru: 'Без изменений'
   },
 }
