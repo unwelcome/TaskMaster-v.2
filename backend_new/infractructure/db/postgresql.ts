@@ -19,8 +19,8 @@ export async function query(text: string, params?: any[]) {
   try {
     const result = await pool.query(text, params);
     return result;
-  } catch (error) {
-    console.error('PostgreSQL Error: executing query', text, error);
+  } catch (error: any) {
+    if(error.code !== '23505') console.error('PostgreSQL Error: executing query', text, error); // 23505 - ошибка уникальности (можно и не выводить)
     throw error;
   }
 }

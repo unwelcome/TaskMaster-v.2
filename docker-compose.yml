@@ -85,6 +85,8 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
+    networks:
+      - app-network
 
 networks:
   app-network:

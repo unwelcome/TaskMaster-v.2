@@ -13,8 +13,8 @@ export interface UserRepository{
 
   updatePassword(dto: UpdateUserPasswordRepositoryDto): Promise<User>,
   updateEmail(dto: UpdateUserEmailRepositoryDto): Promise<User>,
-  updateFio(dto: UpdateUserAvatarRepositoryDto): Promise<User>,
-  updateAvatar(dto: UpdateUserFioRepositoryDto): Promise<User>,
+  updateFio(dto: UpdateUserFioRepositoryDto): Promise<User>,
+  updateAvatar(dto: UpdateUserAvatarRepositoryDto): Promise<User>,
 
   delete(id: number): Promise<number>,
 }

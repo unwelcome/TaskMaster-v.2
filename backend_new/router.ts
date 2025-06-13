@@ -19,6 +19,8 @@ router.get('/user', (req: Request, res: Response) => userController.getUserByEma
 router.get('/group/:group_id/users', (req: Request, res: Response) => userController.getAllUsersByGroupId(req, res)); // remove to groups routes
 router.post('/signup', (req: Request, res: Response) => userController.createUser(req, res));
 router.post('/login', (req: Request, res: Response) => userController.loginUser(req, res));
-router.put('/user/:id/password', (req: Request, res: Response) => userController.updateUserPassword(req, res));
+router.put('/user/:id/password', (req: Request, res: Response) => userController.updateUserPassword(req, res)); // брать userID из токена а не из адреса!
+router.put('/user/:id/email', (req: Request, res: Response) => userController.updateUserEmail(req, res)); // брать userID из токена а не из адреса!
+router.put('/user/:id/fio', (req: Request, res: Response) => userController.updateUserFio(req, res)); // брать userID из токена а не из адреса!
 
 export default router;

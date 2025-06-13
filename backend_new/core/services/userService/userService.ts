@@ -1,8 +1,8 @@
 import { checkPassword, hashPassword } from "../../../common/passwordHelpers";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from "../../errors/userErrors";
 import { UserRepository } from "../../repositories/UserRepository/userRepository";
-import { CreateUserRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
+import { CreateUserRepositoryDto, UpdateUserEmailRepositoryDto, UpdateUserFioRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";
+import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
 
 export class UserService{
   constructor(readonly userRepository: UserRepository) {}
@@ -103,4 +103,47 @@ export class UserService{
     }
   }
 
+  async updateEmail(dto: UpdateUserEmailServiceDto){
+    try{
+      //Get user by id
+      const userById = await this.userRepository.getById(dto.id);
+      //check user exists
+      if(userById === undefined) throw new UserNotFoundError(dto.id);
+      //check if email the same
+      if(dto.email === userById.email) throw new UserNotChangedError(dto.id);
+      //else create Dto
+      const updateUserEmailRepositoryDto: UpdateUserEmailRepositoryDto = {
+        id: dto.id,
+        email: dto.email
+      }
+      //update email
+      const updatedUser = await this.userRepository.updateEmail(updateUserEmailRepositoryDto);
+      return updatedUser;
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async updateFio(dto: UpdateUserFioServiceDto){
+    try{
+      //Get user by id
+      const userById = await this.userRepository.getById(dto.id);
+      //check user exists
+      if(userById === undefined) throw new UserNotFoundError(dto.id);
+      //check if email the same
+      if(dto.first_name === userById.first_name && dto.last_name === userById.last_name && dto.middle_name === userById.middle_name) throw new UserNotChangedError(dto.id);
+      //else create Dto
+      const updateUserFioRepositoryDto: UpdateUserFioRepositoryDto = {
+        id: dto.id,
+        first_name: dto.first_name,
+        last_name: dto.last_name,
+        middle_name: dto.middle_name,
+      }
+      //update email
+      const updatedUser = await this.userRepository.updateFio(updateUserFioRepositoryDto);
+      return updatedUser;
+    }catch(err){
+      throw err;
+    }
+  }
 }

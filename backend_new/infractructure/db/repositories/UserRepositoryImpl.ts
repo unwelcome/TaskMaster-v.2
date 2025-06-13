@@ -70,7 +70,7 @@ export class UserRepositoryImpl implements UserRepository{
   }
   async updateEmail(dto: UpdateUserEmailRepositoryDto): Promise<User> {
     try{
-      const result = await db.query('UPDATE users SET email = $2 WHERE id = $1', [dto.id, dto.email]);
+      const result = await db.query('UPDATE users SET email = $2 WHERE id = $1 RETURNING *', [dto.id, dto.email]);
       if(result.rowCount === 0) throw new UserNotFoundError(dto.id);
       return result.rows[0];
     }catch(err: any){
@@ -80,18 +80,18 @@ export class UserRepositoryImpl implements UserRepository{
       else throw new PostgreSQLError('Update user email error');
     }
   }
-  async updateFio(dto: UpdateUserAvatarRepositoryDto): Promise<User> {
+  async updateFio(dto: UpdateUserFioRepositoryDto): Promise<User> {
     try{
-      const result = await db.query('UPDATE users SET avatar_url = $2 WHERE id = $1', [dto.id, dto.avatar_url]);
+      const result = await db.query('UPDATE users SET first_name = $2, last_name = $3, middle_name = $4 WHERE id = $1 RETURNING *', [dto.id, dto.first_name, dto.last_name, dto.middle_name]);
       if(result.rowCount === 0) throw new UserNotFoundError(dto.id);
       return result.rows[0];
     }catch(err){
       throw new PostgreSQLError('Update user avatar_url error');
     }
   }
-  async updateAvatar(dto: UpdateUserFioRepositoryDto): Promise<User> {
+  async updateAvatar(dto: UpdateUserAvatarRepositoryDto): Promise<User> {
     try{
-      const result = await db.query('UPDATE users SET first_name = $2, last_name = $3, middle_name = $3 WHERE id = $1', [dto.id, dto.first_name, dto.last_name, dto.middle_name]);
+      const result = await db.query('UPDATE users SET avatar_url = $2 WHERE id = $1 RETURNING *', [dto.id, dto.avatar_url]);
       if(result.rowCount === 0) throw new UserNotFoundError(dto.id);
       return result.rows[0];
     }catch(err){

@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { UserService } from "../../core/services/userService/userService";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
+import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from '../../core/errors/userErrors';
 import { ErrorCode } from '../../core/errors/errorCodes';
 import { UserFieldsConfig } from '../../common/fieldsConfig';
+import { PostgreSQLUniqueError } from '../../core/errors/dbErrors';
 
 export class UserController {
   constructor(readonly userService: UserService) {}
@@ -342,7 +343,7 @@ export class UserController {
 
   async updateUserPassword(req: Request, res: Response): Promise<void>{
     try{
-      const { id } = req.params as { id: string };
+      const { id } = req.params as { id: string }; // change
       const { password } = req.body as { password: string };
 
       //Exists required fields
@@ -416,5 +417,188 @@ export class UserController {
     }
   } 
 
-  
+  async updateUserEmail(req: Request, res: Response): Promise<void>{
+    try{
+      const { id } = req.params as { id: string }; // change
+      const { email } = req.body as { email: string };
+
+      //Exists required fields
+      if(!id || !email){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields',
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const number_id = parseInt(id);
+
+      //Validate id as number
+      if(isNaN(number_id) || number_id < 0){
+        res.status(422).json({
+          error: {
+            message: 'Invalid user id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      //Email validation
+      if(email.length < UserFieldsConfig.EMAIL_MIN_LENGTH || email.length > UserFieldsConfig.EMAIL_MAX_LENGTH){
+        res.status(422).json({
+          error:{
+            message: 'Invalid email',
+            code: ErrorCode.INVALID_EMAIL_FORMAT
+          }
+        });
+        return;
+      }
+
+      const updateUserEmailServiceDto: UpdateUserEmailServiceDto = {
+        id: number_id,
+        email: email
+      }
+
+      const newUser = await this.userService.updateEmail(updateUserEmailServiceDto);
+      res.status(200).json(newUser);
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+      if(err instanceof UserNotChangedError){
+        res.status(304).json({
+          error: {
+            message: 'Nothing changed',
+            code: ErrorCode.NOTHING_CHANGED
+          }
+        });
+        return;
+      }
+      if(err instanceof PostgreSQLUniqueError){
+        res.status(406).json({
+          error: {
+            message: 'Email is already used',
+            code: ErrorCode.EMAIL_ALREADY_EXISTS
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async updateUserFio(req: Request, res: Response): Promise<void>{
+    try{
+      const { id } = req.params as { id: string }; // change
+      const { first_name, last_name, middle_name } = req.body as { first_name: string, last_name: string, middle_name?: string };
+
+      //Exists required fields
+      if(!id || !first_name || !last_name){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields',
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const number_id = parseInt(id);
+
+      //Validate id as number
+      if(isNaN(number_id) || number_id < 0){
+        res.status(422).json({
+          error: {
+            message: 'Invalid user id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      //FirstName validation
+      if(first_name.length < UserFieldsConfig.FIRST_NAME_MIN_LENGTH || first_name.length > UserFieldsConfig.FIRST_NAME_MAX_LENGTH){
+        res.status(422).json({
+          error:{
+            message: 'Invalid first name',
+            code: ErrorCode.INVALID_FIRST_NAME_FORMAT
+          }
+        });
+        return;
+      }
+
+      //LastName validation
+      if(last_name.length < UserFieldsConfig.LAST_NAME_MIN_LENGTH || last_name.length > UserFieldsConfig.LAST_NAME_MAX_LENGTH){
+        res.status(422).json({
+          error:{
+            message: 'Invalid last name',
+            code: ErrorCode.INVALID_LAST_NAME_FORMAT
+          }
+        });
+        return;
+      }
+
+      //MiddleName validation
+      if(middle_name !== undefined && (middle_name.length < UserFieldsConfig.MIDDLE_NAME_MIN_LENGTH || middle_name.length > UserFieldsConfig.MIDDLE_NAME_MAX_LENGTH)){
+        res.status(422).json({
+          error:{
+            message: 'Invalid middle name',
+            code: ErrorCode.INVALID_MIDDLE_NAME_FORMAT
+          }
+        });
+        return;
+      }
+
+      const updateUserFioServiceDto: UpdateUserFioServiceDto = {
+        id: number_id,
+        first_name: first_name,
+        last_name: last_name,
+        middle_name: middle_name === undefined ? null : middle_name,
+      }
+
+      const newUser = await this.userService.updateFio(updateUserFioServiceDto);
+      res.status(200).json(newUser);
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+      if(err instanceof UserNotChangedError){
+        res.status(304).json({
+          error: {
+            message: 'Nothing changed',
+            code: ErrorCode.NOTHING_CHANGED
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
 }

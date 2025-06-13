@@ -8,6 +8,6 @@ export class PostgreSQLError extends Error {
 export class PostgreSQLUniqueError extends Error {
   constructor(readonly message: string) {
     super(`PostgreSQL unique constraint error: ${message}`);
-    Object.setPrototypeOf(this, PostgreSQLError.prototype);
+    Object.setPrototypeOf(this, PostgreSQLUniqueError.prototype);
   }
 }
