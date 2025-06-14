@@ -14,10 +14,18 @@ export class UserNotFoundError extends Error {
   }
 }
 
+export class UserWrongPasswordError extends Error {
+  constructor() {
+    super(`Wrong user password`);
+    this.name = 'UserWrongPasswordError';
+    Object.setPrototypeOf(this, UserWrongPasswordError.prototype);
+  }
+}
+
 export class UserNotFoundByEmailError extends Error {
   constructor(readonly email: string) {
     super(`User with email ${email} not found`);
-    this.name = 'UserNotFoundError';
+    this.name = 'UserNotFoundByEmailError';
     Object.setPrototypeOf(this, UserNotFoundByEmailError.prototype);
   }
 }
@@ -25,7 +33,7 @@ export class UserNotFoundByEmailError extends Error {
 export class UserNotChangedError extends Error {
   constructor(readonly id: number) {
     super(`User with ID ${id} not changed`);
-    this.name = 'UserNotFoundError';
+    this.name = 'UserNotChangedError';
     Object.setPrototypeOf(this, UserNotChangedError.prototype);
   }
 }

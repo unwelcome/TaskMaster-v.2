@@ -5,6 +5,7 @@ export const enum ErrorCode {
   EMAIL_ALREADY_EXISTS = "EMAIL_ALREADY_EXISTS",  // email уже зарегистрирован
   INVALID_TOKEN = "INVALID_TOKEN",                // Неверный токен
   TOKEN_EXPIRED = "TOKEN_EXPIRED",                // Срок действия токена истек
+  MISSING_TOKEN = "MISSING_TOKEN",                // Нет JWT токена авторизации
   NOT_ENOUGH_RIGHTS = "NOT_ENOUGH_RIGHTS",        // Недостаточно прав
   WRONG_PASSWORD = "WRONG_PASSWORD",              // Неверный пароль пользователя
 
@@ -41,6 +42,9 @@ export const ErrorMessages = {
   },
   TOKEN_EXPIRED: {
     ru: 'Токен истек'
+  },
+  MISSING_TOKEN: {
+    ru: 'Нет токена'
   },
   NOT_ENOUGH_RIGHTS: {
     ru: 'Недостаточно прав для выполнения действия'

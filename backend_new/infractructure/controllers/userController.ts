@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { UserService } from "../../core/services/userService/userService";
 import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
-import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from '../../core/errors/userErrors';
+import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError, UserWrongPasswordError } from '../../core/errors/userErrors';
 import { ErrorCode } from '../../core/errors/errorCodes';
 import { UserFieldsConfig } from '../../common/fieldsConfig';
 import { PostgreSQLUniqueError } from '../../core/errors/dbErrors';
+import { NoSecretKeyError } from '../../core/errors/jwtErrors';
 
 export class UserController {
   constructor(readonly userService: UserService) {}
@@ -162,23 +163,45 @@ export class UserController {
       }
 
       //Check password correct
-      const isLoginCorrect = await this.userService.login(loginUserServiceDto);
+      const { access_token, refresh_token } = await this.userService.login(loginUserServiceDto);
 
-      if(isLoginCorrect) res.status(200).json({access_token: 'ACCESS_TOKEN'}); // Correct password -> redirect to token gain route
-      else res.status(403).json({ // Wrong password
-          error: {
-            message: 'Wrong password',
-            code: ErrorCode.WRONG_PASSWORD
-          }
-        });
+      res.cookie('refresh_token', refresh_token, {
+        httpOnly: UserFieldsConfig.REFRESH_HTTP_ONLY,
+        secure: UserFieldsConfig.REFRESH_SECURE,
+        sameSite: UserFieldsConfig.REFRESH_SAMESITE,
+        path: UserFieldsConfig.REFRESH_PATH,
+        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME
+      });
 
-      return;
+      res.status(200).json({
+        access_token: access_token
+      });
     }catch(err){
       if(err instanceof UserNotFoundByEmailError){
         res.status(404).json({
           error:{
             message: 'User not found',
             code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+
+      if(err instanceof NoSecretKeyError){
+        res.status(500).json({
+          error:{
+            message: 'Internal server error, no secret key',
+            code: ErrorCode.INTERNAL_SERVER_ERROR
+          }
+        });
+        return;
+      }
+
+      if(err instanceof UserWrongPasswordError){
+        res.status(403).json({
+          error: {
+            message: 'Wrong password',
+            code: ErrorCode.WRONG_PASSWORD
           }
         });
         return;
