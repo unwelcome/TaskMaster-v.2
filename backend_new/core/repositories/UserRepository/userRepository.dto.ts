@@ -25,7 +25,7 @@ export interface UpdateUserEmailRepositoryDto{
 //Update user avatar
 export interface UpdateUserAvatarRepositoryDto{
   id: number,
-  avatar_url: string,
+  avatar_url: string | null,
 }
 
 //Update user FIO

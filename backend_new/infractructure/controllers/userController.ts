@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from "../../core/services/userService/userService";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
+import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from '../../core/errors/userErrors';
 import { ErrorCode } from '../../core/errors/errorCodes';
 import { UserFieldsConfig } from '../../common/fieldsConfig';
@@ -588,6 +588,121 @@ export class UserController {
           error: {
             message: 'Nothing changed',
             code: ErrorCode.NOTHING_CHANGED
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async updateUserAvatar(req: Request, res: Response): Promise<void>{
+    try{
+      const { id } = req.params as { id: string }; // change
+      const { avatar_url } = req.body as { avatar_url: string | null };
+
+      //Exists required fields
+      if(!id){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields',
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const number_id = parseInt(id);
+
+      //Validate id as number
+      if(isNaN(number_id) || number_id < 0){
+        res.status(422).json({
+          error: {
+            message: 'Invalid user id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      const updateUserAvatarServiceDto: UpdateUserAvatarServiceDto = {
+        id: number_id,
+        avatar_url: (typeof avatar_url !== 'string' || avatar_url.trim() === '') ? null : avatar_url.trim(),
+      }
+
+      const newUser = await this.userService.updateAvatar(updateUserAvatarServiceDto);
+      res.status(200).json(newUser);
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+      if(err instanceof UserNotChangedError){
+        res.status(304).json({
+          error: {
+            message: 'Nothing changed',
+            code: ErrorCode.NOTHING_CHANGED
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async deleteUser(req: Request, res: Response): Promise<void>{
+    try{
+      const { id } = req.params as { id: string }; // change
+
+      //Exists required fields
+      if(!id){
+        res.status(400).json({
+          error: {
+            message: 'Missing required fields',
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const number_id = parseInt(id);
+
+      //Validate id as number
+      if(isNaN(number_id) || number_id < 0){
+        res.status(422).json({
+          error: {
+            message: 'Invalid user id',
+            code: ErrorCode.INVALID_INPUT
+          }
+        });
+        return;
+      }
+
+      const deletedUser = await this.userService.delete(number_id);
+      res.status(204).json(`User with id:${number_id} deleted successfully`)
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
           }
         });
         return;

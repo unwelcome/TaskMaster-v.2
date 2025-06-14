@@ -1,8 +1,8 @@
 import { checkPassword, hashPassword } from "../../../common/passwordHelpers";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from "../../errors/userErrors";
 import { UserRepository } from "../../repositories/UserRepository/userRepository";
-import { CreateUserRepositoryDto, UpdateUserEmailRepositoryDto, UpdateUserFioRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
+import { CreateUserRepositoryDto, UpdateUserAvatarRepositoryDto, UpdateUserEmailRepositoryDto, UpdateUserFioRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";
+import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
 
 export class UserService{
   constructor(readonly userRepository: UserRepository) {}
@@ -142,6 +142,36 @@ export class UserService{
       //update email
       const updatedUser = await this.userRepository.updateFio(updateUserFioRepositoryDto);
       return updatedUser;
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async updateAvatar(dto: UpdateUserAvatarServiceDto){
+    try{
+      //Get user by id
+      const userById = await this.userRepository.getById(dto.id);
+      //check user exists
+      if(userById === undefined) throw new UserNotFoundError(dto.id);
+      //check if avatar the same
+      if(dto.avatar_url === userById.avatar_url) throw new UserNotChangedError(dto.id);
+      //else create Dto
+      const updateUserAvatarRepositoryDto: UpdateUserAvatarRepositoryDto = {
+        id: dto.id,
+        avatar_url: dto.avatar_url
+      }
+      //update avatar
+      const updatedUser = await this.userRepository.updateAvatar(updateUserAvatarRepositoryDto);
+      return updatedUser;
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async delete(id: number){
+    try{
+      const deletedUser = await this.userRepository.delete(id);
+      return deletedUser;
     }catch(err){
       throw err;
     }
