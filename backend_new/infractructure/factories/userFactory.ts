@@ -1,4 +1,4 @@
-import { UserService } from "../../core/services/userService/userService";
+import { UserService } from "../../core/services/UserService/userService";
 import { UserController } from "../controllers/userController";
 import { UserRepositoryImpl } from "../db/repositories/UserRepositoryImpl";
 

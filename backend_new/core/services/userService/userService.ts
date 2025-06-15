@@ -1,6 +1,6 @@
 import { UserFieldsConfig } from "../../../common/fieldsConfig";
 import { checkPassword, hashPassword } from "../../../common/passwordHelpers";
-import { NoSecretKeyError } from "../../errors/jwtErrors";
+import { NoSecretKeyError } from "../../errors/tokenErrors";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError, UserWrongPasswordError } from "../../errors/userErrors";
 import { UserRepository } from "../../repositories/UserRepository/userRepository";
 import { CreateUserRepositoryDto, UpdateUserAvatarRepositoryDto, UpdateUserEmailRepositoryDto, UpdateUserFioRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { UserService } from "../../core/services/userService/userService";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/userService/userService.dto";
+import { UserService } from "../../core/services/UserService/userService";
+import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/UserService/userService.dto";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError, UserWrongPasswordError } from '../../core/errors/userErrors';
 import { ErrorCode } from '../../core/errors/errorCodes';
 import { UserFieldsConfig } from '../../common/fieldsConfig';
 import { PostgreSQLUniqueError } from '../../core/errors/dbErrors';
-import { NoSecretKeyError } from '../../core/errors/jwtErrors';
+import { NoSecretKeyError } from '../../core/errors/tokenErrors';
 
 export class UserController {
   constructor(readonly userService: UserService) {}
