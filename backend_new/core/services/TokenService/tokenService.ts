@@ -1,6 +1,6 @@
 import { UserFieldsConfig } from "../../../common/fieldsConfig";
 import { checkPassword } from "../../../common/passwordHelpers";
-import { InvalidTokenError, NoSecretKeyError, TokenExpiredError, TokenNotFoundError } from "../../errors/tokenErrors";
+import { InvalidTokenError, NoSecretKeyError, TokenExpiredError } from "../../errors/tokenErrors";
 import { UserNotFoundByEmailError, UserWrongPasswordError } from "../../errors/userErrors";
 import { AccessTokenBody, RefreshTokenBody } from "../../models/tokenModel";
 import { TokenRepository } from "../../repositories/TokenRepository/tokenRepository";
@@ -14,7 +14,7 @@ import { AddRefreshTokenRepositoryDto, DeleteRefreshTokenRepositoryDto } from ".
 export class TokenService{
   constructor(readonly tokenRepository: TokenRepository, readonly userRepository: UserRepository) {}
 
-    async login(dto: LoginTokenServiceDto){
+  async login(dto: LoginTokenServiceDto){
     try{
       //Ищем пользователя по почте
       const userWithEmail = await this.userRepository.getByEmail(dto.email);
@@ -29,81 +29,68 @@ export class TokenService{
         user_agent: dto.user_agent,
       }
       //Создаем токены
-      const { access_token, refresh_token, refresh_token_id } = this.createTokens(createTokenServiceDto);
+      const { access_token, refreshTokenBody, refreshTokenId } = this.createTokens(createTokenServiceDto);
 
       const addRefreshTokenRepositoryDto: AddRefreshTokenRepositoryDto = {
         user_id: userWithEmail.id,
-        token_id: refresh_token_id,
-        token: refresh_token,
+        token_id: refreshTokenId,
+        token_body: refreshTokenBody,
       }
       //Сохраняем токен
       await this.tokenRepository.addRefreshToken(addRefreshTokenRepositoryDto);
 
-      return { access_token, refresh_token };
+      return { access_token, refreshTokenId };
     }catch(err){
       throw err;
     }
   }
 
   async refresh(dto: RefreshTokenServiceDto){
-    try{
-      //Декодируем refresh токен
-      const refreshTokenBody = this.decodeJwt<RefreshTokenBody>(dto.token);
-
-      //Получаем все refresh токены пользователя
-      const userTokens = await this.tokenRepository.getAllRefreshTokens(refreshTokenBody.user_id);
-
-      //Проверяем чтобы текущий токен был в списке, если нет - его скомпрометировали
-      if(!userTokens.includes(dto.token)) throw new TokenNotFoundError();
+    try{      
+      //Получаем старый токен из бд 
+      const oldRefreshTokenBody = await this.tokenRepository.getRefreshTokenById(dto.token_id);
 
       //Иначе создаем новые токены
       const createTokenServiceDto: CreateTokenServiceDto = {
         ip: dto.ip,
-        user_id: refreshTokenBody.user_id,
+        user_id: oldRefreshTokenBody.user_id,
         user_agent: dto.user_agent,
       }
-      const { access_token, refresh_token, refresh_token_id } = this.createTokens(createTokenServiceDto);
+      const { access_token, refreshTokenBody, refreshTokenId } = this.createTokens(createTokenServiceDto);
 
       //Удаляем старый токен
       const deleteRefreshTokenRepositoryDto: DeleteRefreshTokenRepositoryDto = {
-        user_id: refreshTokenBody.user_id,
-        token_id: refreshTokenBody.token_id,
-        token: dto.token,
+        user_id: oldRefreshTokenBody.user_id,
+        token_id: oldRefreshTokenBody.token_id,
       }
       await this.tokenRepository.deleteRefreshToken(deleteRefreshTokenRepositoryDto);
 
       //Сохраняем новый токен
       const addRefreshTokenRepositoryDto: AddRefreshTokenRepositoryDto = {
-        user_id: refreshTokenBody.user_id,
-        token_id: refresh_token_id,
-        token: refresh_token,
+        user_id: oldRefreshTokenBody.user_id,
+        token_id: refreshTokenId,
+        token_body: refreshTokenBody,
       }
       await this.tokenRepository.addRefreshToken(addRefreshTokenRepositoryDto);
 
-      //Возвращаем новые токены
-      return { access_token, refresh_token };
+      //Возвращаем новый access_token и refreshTokenId
+      return { access_token, refreshTokenId };
     }catch(err){
       throw err;
     }
   }
 
-  async logout(token: string){
+  async logout(token_id: string){
     try{
-      //Декодируем refresh токен
-      const refreshTokenBody = this.decodeJwt<RefreshTokenBody>(token);
-
-      //Получаем все refresh токены пользователя
-      const userTokens = await this.tokenRepository.getAllRefreshTokens(refreshTokenBody.user_id);
-
-      //Проверяем чтобы текущий токен был в списке, если нет - его скомпрометировали
-      if(!userTokens.includes(token)) throw new TokenNotFoundError();
+      //Получаем refresh токен
+      const refreshTokenBody = await this.tokenRepository.getRefreshTokenById(token_id);
 
       //Удаляем токен
       const deleteRefreshTokenRepositoryDto: DeleteRefreshTokenRepositoryDto = {
         user_id: refreshTokenBody.user_id,
-        token_id: refreshTokenBody.token_id,
-        token: token,
+        token_id: token_id,
       }
+
       return await this.tokenRepository.deleteRefreshToken(deleteRefreshTokenRepositoryDto);
     }catch(err){
       throw err;
@@ -122,18 +109,22 @@ export class TokenService{
   }
 
   private createTokens(dto: CreateTokenServiceDto){
+
     //Получаем секретный ключ из переменных окружения
     const secretKey = process.env.JWT_SECRET;
     //Если ключа нет -> ошибка
     if(!secretKey) throw new NoSecretKeyError();
+
     //Тело access токена
     const accessTokenBody: AccessTokenBody = {
       user_id: dto.user_id
     }
+
     //Генерируем id для рефреш токена
     const refreshTokenId = uuidv4();
     //Парсим user-agent
     const { browser, device, os } = UAParser(dto.user_agent);
+
     //Тело refresh токена
     const refreshTokenBody: RefreshTokenBody = {
       token_id: refreshTokenId,
@@ -143,22 +134,19 @@ export class TokenService{
       os_name: os.name ? os.name : '',
       device_type: device.type ? device.type : '',
       device_model: device.model ? device.model : '',
+      created_at: Date.now()
     }
+
     //Подписываем аксес токен
     const access_token = jwt.sign(accessTokenBody, secretKey, {
       expiresIn: UserFieldsConfig.ACCESS_TOKEN_EXPIRE_TIME,
       algorithm: 'HS256',
     });
-    //Подписываем рефреш токен
-    const refresh_token = jwt.sign(refreshTokenBody, secretKey, {
-      expiresIn: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME,
-      algorithm: 'HS256',
-    });
 
     return { 
       access_token, 
-      refresh_token, 
-      refresh_token_id: refreshTokenId 
+      refreshTokenBody, 
+      refreshTokenId
     };
   }
 

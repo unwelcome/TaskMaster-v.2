@@ -6,11 +6,7 @@ export interface RefreshTokenBody{
   os_name: string,
   device_type: string,
   device_model: string,
-}
-
-export interface RefreshTokenDB{
-  token_id: string,
-  token: string, // jwt.encode(RefreshTokenBody)
+  created_at: number,
 }
 
 export interface AccessTokenBody{

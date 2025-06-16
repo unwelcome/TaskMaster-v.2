@@ -4,6 +4,7 @@ dotenv.config({ path: '../.env'});
 import express from "express";
 import cors from "cors";
 import router from "./router";
+import cookieParser from 'cookie-parser';
 
 
 const app = express();
@@ -16,6 +17,8 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 app.use(cors());
 //JSON body parse
 app.use(express.json());
+//Cookie parse
+app.use(cookieParser());
 //User router
 app.use('/api', router);
 

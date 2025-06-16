@@ -16,6 +16,6 @@ export interface CreateTokenServiceDto {
 //Refresh access and refresh tokens
 export interface RefreshTokenServiceDto{
   ip: string,
-  token: string,
+  token_id: string,
   user_agent: string,
 }
