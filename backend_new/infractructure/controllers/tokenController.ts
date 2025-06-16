@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { TokenService } from "../../core/services/TokenService/tokenService";
 import { ErrorCode } from "../../core/errors/errorCodes";
-import { InvalidTokenError, NoSecretKeyError, TokenExpiredError } from "../../core/errors/tokenErrors";
+import { InvalidTokenError, NoSecretKeyError, TokenExpiredError, TokenNotFoundError } from "../../core/errors/tokenErrors";
 import { UserFieldsConfig } from "../../common/fieldsConfig";
 import { LoginTokenServiceDto, RefreshTokenServiceDto } from "../../core/services/TokenService/tokenService.dto";
 import { UserNotFoundByEmailError, UserWrongPasswordError } from "../../core/errors/userErrors";
@@ -133,7 +133,7 @@ export class TokenController{
         secure: UserFieldsConfig.REFRESH_SECURE,
         sameSite: UserFieldsConfig.REFRESH_SAMESITE,
         path: UserFieldsConfig.REFRESH_PATH,
-        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME
+        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME * 1000,
       });
 
       res.status(200).json({
@@ -200,6 +200,16 @@ export class TokenController{
         message: 'Logout successfully'  
       });
     }catch(err){
+      if(err instanceof TokenNotFoundError){
+        res.status(400).json({
+          error: {
+            message: 'Invalid token',
+            code: ErrorCode.INVALID_TOKEN
+          }
+        });
+        return;
+      }
+
       res.status(500).json({
         error: {
           message: 'Internal server error',
@@ -237,13 +247,23 @@ export class TokenController{
         secure: UserFieldsConfig.REFRESH_SECURE,
         sameSite: UserFieldsConfig.REFRESH_SAMESITE,
         path: UserFieldsConfig.REFRESH_PATH,
-        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME
+        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME * 1000,
       });
 
       res.status(200).json({
         access_token: access_token
       });
     }catch(err){
+      if(err instanceof TokenNotFoundError){
+        res.status(400).json({
+          error: {
+            message: 'Invalid token',
+            code: ErrorCode.INVALID_TOKEN
+          }
+        });
+        return;
+      }
+
       res.status(500).json({
         error: {
           message: 'Internal server error',

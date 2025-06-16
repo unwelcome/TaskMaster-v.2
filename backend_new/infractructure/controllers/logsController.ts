@@ -16,6 +16,8 @@ export function logsController(req: Request, res: Response, next: NextFunction){
 
   const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 
-  console.log(`Request #${++RequestsArray.count}: time: ${formattedDate}; type: ${req.method}; path: ${req.path}; body: ${JSON.stringify(req?.body)}`);
+  const stringified_cookies = JSON.stringify(req.cookies);
+
+  console.log(`Request #${++RequestsArray.count}: time: ${formattedDate}; type: ${req.method}; path: ${req.path}; cookie: ${stringified_cookies}; body: ${JSON.stringify(req?.body)}`);
   next();
 }
