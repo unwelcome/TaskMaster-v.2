@@ -1,10 +1,11 @@
 import { Response, Request, NextFunction } from "express";
 import { TokenService } from "../../core/services/TokenService/tokenService";
 import { ErrorCode } from "../../core/errors/errorCodes";
-import { InvalidTokenError, NoSecretKeyError, TokenExpiredError, TokenNotFoundError } from "../../core/errors/tokenErrors";
+import { AnotherUserTokenError, InvalidTokenError, NoSecretKeyError, TokenExpiredError, TokenNotFoundError } from "../../core/errors/tokenErrors";
 import { UserFieldsConfig } from "../../common/fieldsConfig";
-import { LoginTokenServiceDto, RefreshTokenServiceDto } from "../../core/services/TokenService/tokenService.dto";
+import { DeleteAllRefreshTokenServiceDto, DeleteRefreshTokenServiceDto, LoginTokenServiceDto, RefreshTokenServiceDto } from "../../core/services/TokenService/tokenService.dto";
 import { UserNotFoundByEmailError, UserWrongPasswordError } from "../../core/errors/userErrors";
+import { AuthRequest } from "../../common/interfaces";
 
 export class TokenController{
   constructor(readonly tokenService: TokenService) {}
@@ -37,6 +38,7 @@ export class TokenController{
       }
 
       const accessTokenBody = await this.tokenService.check(token);
+      (req as AuthRequest).user_id = accessTokenBody.user_id;
       next();
     }catch(err){
       if(err instanceof NoSecretKeyError){
@@ -128,18 +130,7 @@ export class TokenController{
       //Check password correct and create tokens
       const { access_token, refreshTokenId } = await this.tokenService.login(loginTokenServiceDto);
 
-      res.cookie('refresh_token_id', refreshTokenId, {
-        httpOnly: UserFieldsConfig.REFRESH_HTTP_ONLY,
-        secure: UserFieldsConfig.REFRESH_SECURE,
-        sameSite: UserFieldsConfig.REFRESH_SAMESITE,
-        path: UserFieldsConfig.REFRESH_PATH,
-        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME * 1000,
-      });
-
-      res.status(200).json({
-        access_token: access_token
-      });
-      
+      this.saveTokens(res, access_token, refreshTokenId);
     }catch(err){
       if(err instanceof UserNotFoundByEmailError){
         res.status(404).json({
@@ -242,22 +233,12 @@ export class TokenController{
 
       const { access_token, refreshTokenId } = await this.tokenService.refresh(refreshTokenServiceDto);
 
-      res.cookie('refresh_token_id', refreshTokenId, {
-        httpOnly: UserFieldsConfig.REFRESH_HTTP_ONLY,
-        secure: UserFieldsConfig.REFRESH_SECURE,
-        sameSite: UserFieldsConfig.REFRESH_SAMESITE,
-        path: UserFieldsConfig.REFRESH_PATH,
-        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME * 1000,
-      });
-
-      res.status(200).json({
-        access_token: access_token
-      });
+      this.saveTokens(res, access_token, refreshTokenId);
     }catch(err){
       if(err instanceof TokenNotFoundError){
         res.status(400).json({
           error: {
-            message: 'Invalid token',
+            message: 'Previous token not found',
             code: ErrorCode.INVALID_TOKEN
           }
         });
@@ -273,27 +254,91 @@ export class TokenController{
     }
   }
 
-  async getAllTokens(req: Request, res: Response): Promise<void>{
+  async getAllTokens(req: AuthRequest, res: Response): Promise<void>{
     try{
-      
+      const userTokens = await this.tokenService.getUserTokens(req.user_id);
+      res.status(200).json(userTokens);
     }catch(err){
-
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+      return;
     }
   }
 
-  async closeToken(req: Request, res: Response): Promise<void>{
+  async closeToken(req: AuthRequest, res: Response): Promise<void>{
     try{
+      const { refresh_token_id } = req.body as { refresh_token_id: string };
 
+      if(!refresh_token_id){
+        res.status(400).json({
+          error: {
+            message: 'Missing refresh token id',
+            code: ErrorCode.MISSING_REQUIRED_FIELD
+          }
+        });
+        return;
+      }
+
+      const deleteRefreshTokenServiceDto: DeleteRefreshTokenServiceDto = {
+        user_id: req.user_id,
+        token_id: refresh_token_id,
+      }
+
+      await this.tokenService.deleteTokenById(deleteRefreshTokenServiceDto);
+      res.status(200).json({message: 'Token deleted successfully'});
     }catch(err){
-
+      if(err instanceof TokenNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'Refresh token not found',
+            code: ErrorCode.TOKEN_NOT_FOUND
+          }
+        });
+        return;
+      }
+      if(err instanceof AnotherUserTokenError){
+        res.status(403).json({
+          error: {
+            message: 'Refresh token belongs to another user',
+            code: ErrorCode.NOT_ENOUGH_RIGHTS
+          }
+        });
+        return;
+      }
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
     }
   }
 
-  async closeAllExceptCurrent(req: Request, res: Response): Promise<void>{
+  async closeAllExceptCurrent(req: AuthRequest, res: Response): Promise<void>{
     try{
+      const userIp = this.getClientIp(req);
 
+      const deleteAllRefreshTokenServiceDto: DeleteAllRefreshTokenServiceDto = {
+        ip: userIp ? userIp : '',
+        user_id: req.user_id,
+        user_agent: req.headers['user-agent'] ? req.headers['user-agent'] : '',
+      }
+
+      const { access_token, refreshTokenId } = await this.tokenService.deleteAllTokens(deleteAllRefreshTokenServiceDto);
+
+      this.saveTokens(res, access_token, refreshTokenId);
     }catch(err){
-
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+      return;
     }
   }
 
@@ -303,5 +348,27 @@ export class TokenController{
       return (forwarded as string).split(',')[0].trim();
     }
     return req.socket.remoteAddress || null;
+  }
+
+  private saveTokens(res: Response, access_token: string, refreshTokenId: string){
+    res.cookie('refresh_token_id', refreshTokenId, {
+      httpOnly: UserFieldsConfig.REFRESH_HTTP_ONLY,
+      secure: UserFieldsConfig.REFRESH_SECURE,
+      sameSite: UserFieldsConfig.REFRESH_SAMESITE,
+      path: UserFieldsConfig.REFRESH_PATH,
+      maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME * 1000,
+    });
+
+    res.cookie('access_token', access_token, {
+      httpOnly: UserFieldsConfig.ACCESS_HTTP_ONLY,
+      secure: UserFieldsConfig.ACCESS_SECURE,
+      sameSite: UserFieldsConfig.ACCESS_SAMESITE,
+      path: UserFieldsConfig.ACCESS_PATH,
+      maxAge: UserFieldsConfig.ACCESS_TOKEN_EXPIRE_TIME * 1000,
+    });
+
+    res.status(200).json({
+      access_token: access_token
+    });
   }
 }

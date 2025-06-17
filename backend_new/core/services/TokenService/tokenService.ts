@@ -1,11 +1,11 @@
 import { UserFieldsConfig } from "../../../common/fieldsConfig";
 import { checkPassword } from "../../../common/passwordHelpers";
-import { InvalidTokenError, NoSecretKeyError, TokenExpiredError } from "../../errors/tokenErrors";
+import { AnotherUserTokenError, InvalidTokenError, NoSecretKeyError, TokenExpiredError, TokenNotFoundError } from "../../errors/tokenErrors";
 import { UserNotFoundByEmailError, UserWrongPasswordError } from "../../errors/userErrors";
 import { AccessTokenBody, RefreshTokenBody } from "../../models/tokenModel";
 import { TokenRepository } from "../../repositories/TokenRepository/tokenRepository";
 import { UserRepository } from "../../repositories/UserRepository/userRepository";
-import { CreateTokenServiceDto, LoginTokenServiceDto, RefreshTokenServiceDto } from "./tokenService.dto";
+import { CreateTokenServiceDto, DeleteAllRefreshTokenServiceDto, DeleteRefreshTokenServiceDto, LoginTokenServiceDto, RefreshTokenServiceDto } from "./tokenService.dto";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
 import { UAParser } from 'ua-parser-js';
@@ -103,6 +103,69 @@ export class TokenService{
       const accessTokenBody = this.decodeJwt<AccessTokenBody>(token);
 
       return accessTokenBody;
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async getUserTokens(user_id: number){
+    try{
+      const allUserTokens = await this.tokenRepository.getAllRefreshTokens(user_id);
+
+      if(!allUserTokens || allUserTokens.length === 0) return ([] as RefreshTokenBody[]);
+
+      return allUserTokens;
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async deleteTokenById(dto: DeleteRefreshTokenServiceDto){
+    try{
+      //Получаем тело удаляемого токена
+      const refreshTokenBody = await this.tokenRepository.getRefreshTokenById(dto.token_id);
+
+      if(!refreshTokenBody || Object.keys(refreshTokenBody).length === 0) throw new TokenNotFoundError();
+
+      //Проверяем что токен принадлежит данному пользователю
+      if(refreshTokenBody.user_id !== dto.user_id) throw new AnotherUserTokenError();
+
+      //Удаляем токен
+      const deleteRefreshTokenRepositoryDto: DeleteRefreshTokenRepositoryDto = {
+        user_id: dto.user_id,
+        token_id: dto.token_id,
+      }
+
+      return await this.tokenRepository.deleteRefreshToken(deleteRefreshTokenRepositoryDto);
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async deleteAllTokens(dto: DeleteAllRefreshTokenServiceDto){
+    try{
+      //Удаляем все токены пользователя
+      await this.tokenRepository.deleteAllRefreshTokens(dto.user_id);
+
+      //Создаем новый токен
+      const createTokenServiceDto: CreateTokenServiceDto = {
+        ip: dto.ip,
+        user_id: dto.user_id,
+        user_agent: dto.user_agent,
+      }
+
+      const { access_token, refreshTokenBody, refreshTokenId } = this.createTokens(createTokenServiceDto);
+
+      //Сохраняем новый токен
+      const addRefreshTokenRepositoryDto: AddRefreshTokenRepositoryDto = {
+        user_id: dto.user_id,
+        token_id: refreshTokenId,
+        token_body: refreshTokenBody,
+      }
+
+      await this.tokenRepository.addRefreshToken(addRefreshTokenRepositoryDto);
+
+      return { access_token, refreshTokenId };
     }catch(err){
       throw err;
     }

@@ -34,7 +34,7 @@ export function API_GetUserInfo(): Promise<IGetUserInfoAnswer | any>{
 //POST signUp user
 export function API_PostSignUp(body: IPostSignUp): Promise<IPostSignUpAnswer | any>{
   return new Promise((resolve, reject) => {
-    axios.post(`${API}/user/signup`, body)
+    axios.post(`${API}/signup`, body)
     .then(response => {
       if(DEVMODE) console.log('SignUp user success: ', response);
       resolve(response.data as IPostSignUpAnswer);
@@ -49,7 +49,7 @@ export function API_PostSignUp(body: IPostSignUp): Promise<IPostSignUpAnswer | a
 //POST logIn user
 export function API_PostLogIn(body: IPostLogIn): Promise<IPostLogInAnswer | any>{
   return new Promise((resolve, reject) => {
-    axios.post(`${API}/user/login`, body)
+    axios.post(`${API}/login`, body)
     .then(response => {
       if(DEVMODE) console.log('LogIn user success: ', response);
       resolve(response.data as IPostLogInAnswer);

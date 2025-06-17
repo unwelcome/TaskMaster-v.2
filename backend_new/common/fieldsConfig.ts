@@ -15,6 +15,11 @@ export const UserFieldsConfig = {
   MIDDLE_NAME_MAX_LENGTH: 50,
 
   ACCESS_TOKEN_EXPIRE_TIME: 60 * 5, // 5 min
+  ACCESS_HTTP_ONLY: false,
+  ACCESS_PATH: '/api',
+  ACCESS_SECURE: process.env.NODE_ENV === 'production',
+  ACCESS_SAMESITE: 'strict' as boolean | "strict" | "none" | "lax" | undefined,
+  
   REFRESH_TOKEN_EXPIRE_TIME: 60 * 60 * 24 * 7, // 7 days
   REFRESH_HTTP_ONLY: true,
   REFRESH_PATH: '/api',

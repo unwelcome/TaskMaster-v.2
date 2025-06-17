@@ -2,6 +2,7 @@ export const enum ErrorCode {
   // Аутентификация и авторизация
   INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',    // неверное тело запроса
   USER_NOT_FOUND = 'USER_NOT_FOUND',              // пользователь не найден
+  TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND',            // токен не найден
   EMAIL_ALREADY_EXISTS = "EMAIL_ALREADY_EXISTS",  // email уже зарегистрирован
   INVALID_TOKEN = "INVALID_TOKEN",                // Неверный токен
   TOKEN_EXPIRED = "TOKEN_EXPIRED",                // Срок действия токена истек
@@ -33,6 +34,9 @@ export const ErrorMessages = {
   },
   USER_NOT_FOUND: {
     ru: 'Пользователь не найден'
+  },
+  TOKEN_NOT_FOUND: {
+    ru: 'Токен не найден'
   },
   EMAIL_ALREADY_EXISTS: {
     ru: 'Данная электронная почта уже используется'

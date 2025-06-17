@@ -29,3 +29,11 @@ export class TokenNotFoundError extends Error {
     Object.setPrototypeOf(this, TokenNotFoundError.prototype);
   }
 }
+
+export class AnotherUserTokenError extends Error {
+  constructor() {
+    super(`Refresh token belongs to another user`);
+    this.name = 'AnotherUserTokenError';
+    Object.setPrototypeOf(this, AnotherUserTokenError.prototype);
+  }
+}
