@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { logsController } from "./infractructure/controllers/logsController";
+import { devController } from "./infractructure/controllers/devController";
 import { getTokenController, getUserController } from "./infractructure/factories/factory";
 import { AuthRequest } from "./common/interfaces";
 
@@ -11,6 +12,9 @@ const tokenController = getTokenController();
 //Logs
 router.use(logsController);
 
+//Dev
+router.use('/dev', devController);
+
 //Authentication
 router.use('/auth', (req: Request, res: Response, next: NextFunction) => tokenController.checkAuth(req, res, next));
 router.get('/refresh', (req :Request, res: Response) => tokenController.refresh(req, res));
@@ -21,16 +25,17 @@ router.delete('/auth/token', (req: Request, res: Response) => tokenController.cl
 router.delete('/auth/tokens', (req: Request, res: Response) => tokenController.closeAllExceptCurrent(req as AuthRequest, res));
 
 //User routes
-router.get('/auth/users', (req: Request, res: Response) => userController.getAllUsers(req, res));
-// router.get('/auth/user', (req: Request, res: Response) => userController.getUserById(req, res)); // getUserInfo
-router.get('/user/:id', (req: Request, res: Response) => userController.getUserById(req, res));
-router.get('/user', (req: Request, res: Response) => userController.getUserByEmail(req, res));
+router.get('/dev/users', (req: Request, res: Response) => userController.getAllUsers(req, res));
+router.get('/auth/user', (req: Request, res: Response) => userController.getUser(req as AuthRequest, res));
+router.get('/dev/user/id/:id', (req: Request, res: Response) => userController.getUserById(req, res));
+router.get('/dev/user/email', (req: Request, res: Response) => userController.getUserByEmail(req, res));
 router.get('/group/:group_id/users', (req: Request, res: Response) => userController.getAllUsersByGroupId(req, res)); // remove to groups routes
 router.post('/signup', (req: Request, res: Response) => userController.createUser(req, res));
-router.patch('/user/:id/password', (req: Request, res: Response) => userController.updateUserPassword(req, res)); // брать userID из токена а не из адреса!
-router.patch('/user/:id/email', (req: Request, res: Response) => userController.updateUserEmail(req, res)); // брать userID из токена а не из адреса!
-router.patch('/user/:id/fio', (req: Request, res: Response) => userController.updateUserFio(req, res)); // брать userID из токена а не из адреса!
-router.patch('/user/:id/avatar', (req: Request, res: Response) => userController.updateUserAvatar(req, res)); // брать userID из токена а не из адреса!
-router.delete('/user/:id', (req: Request, res: Response) => userController.deleteUser(req, res)); // брать userID из токена а не из адреса!
+router.patch('/auth/user/:id/password', (req: Request, res: Response) => userController.updateUserPassword(req as AuthRequest, res));
+router.patch('/auth/user/:id/email', (req: Request, res: Response) => userController.updateUserEmail(req as AuthRequest, res));
+router.patch('/auth/user/:id/fio', (req: Request, res: Response) => userController.updateUserFio(req as AuthRequest, res));
+router.patch('/auth/user/:id/avatar', (req: Request, res: Response) => userController.updateUserAvatar(req as AuthRequest, res));
+router.delete('/dev/user/:id', (req: Request, res: Response) => userController.deleteUserById(req, res));
+router.delete('/auth/user', (req: Request, res: Response) => userController.deleteUser(req as AuthRequest, res));
 
 export default router;

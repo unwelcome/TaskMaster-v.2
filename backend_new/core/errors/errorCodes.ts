@@ -25,6 +25,7 @@ export const enum ErrorCode {
   UNEXPECTED_ERROR = "UNEXPECTED_ERROR",            // Непредвиденная ошибка
   DATABASE_ERROR = "DATABASE_ERROR",                // Непредвиденная ошибка при запросе к бд
   NOTHING_CHANGED = "NOTHING_CHANGED",              // Без изменений
+  DEVELOPER_FEATURE = "DEVELOPER_FEATURE"           // Доступно только в режиме разработки
 }
 
 export const ErrorMessages = {
@@ -96,4 +97,7 @@ export const ErrorMessages = {
   NOTHING_CHANGED: {
     ru: 'Без изменений'
   },
+  DEVELOPER_FEATURE: {
+    ru: 'Доступно только в режиме разработки'
+  }
 }

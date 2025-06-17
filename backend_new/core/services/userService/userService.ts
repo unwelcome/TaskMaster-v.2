@@ -1,10 +1,10 @@
 import { UserFieldsConfig } from "../../../common/fieldsConfig";
 import { checkPassword, hashPassword } from "../../../common/passwordHelpers";
 import { NoSecretKeyError } from "../../errors/tokenErrors";
-import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError, UserWrongPasswordError } from "../../errors/userErrors";
+import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from "../../errors/userErrors";
 import { UserRepository } from "../../repositories/UserRepository/userRepository";
 import { CreateUserRepositoryDto, UpdateUserAvatarRepositoryDto, UpdateUserEmailRepositoryDto, UpdateUserFioRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
+import { CreateUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,44 +29,6 @@ export class UserService{
     }
 
     return this.userRepository.create(createUserDto);
-  }
-
-  async login(dto: LoginUserServiceDto){
-    try{
-      //Ищем пользователя по почте
-      const userWithEmail = await this.userRepository.getByEmail(dto.email);
-      //Если не нашли -> ошибка
-      if(userWithEmail === undefined) throw new UserNotFoundByEmailError(dto.email);
-      //Проверяем пароли
-      if(checkPassword(dto.password, userWithEmail.password_hash, userWithEmail.password_salt)) {
-        //Получаем секретный ключ из переменных окружения
-        const secretKey = process.env.JWT_SECRET;
-        //Если ключа нет -> ошибка
-        if(!secretKey) throw new NoSecretKeyError();
-
-        //Иначе подписываем аксес токен
-        const access_token = jwt.sign({ id: userWithEmail.id }, secretKey, {
-          expiresIn: UserFieldsConfig.ACCESS_TOKEN_EXPIRE_TIME,
-          algorithm: 'HS256',
-        });
-        //Подписываем рефреш токен
-        const refresh_token = jwt.sign({ user_id: userWithEmail.id, token_id: uuidv4() }, secretKey, {
-          expiresIn: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME,
-          algorithm: 'HS256',
-        })
-        
-        //
-        //ЗАПИСАТЬ В REDIS REFRESH TOKEN UUID
-        //
-
-        //Возвращаем токены
-        return { access_token, refresh_token };
-      }
-      //если пароли не равны -> ошибка
-      throw new UserWrongPasswordError();
-    }catch(err){
-      throw err;
-    }
   }
 
   async getAll(){

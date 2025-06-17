@@ -7,12 +7,6 @@ export interface CreateUserServiceDto {
   middle_name: string | null,
 }
 
-//Login user
-export interface LoginUserServiceDto {
-  email: string,
-  password: string,
-}
-
 //Update user password
 export interface UpdateUserPasswordServiceDto{
   id: number,

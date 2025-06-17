@@ -23,5 +23,5 @@ app.use(cookieParser());
 app.use('/api', router);
 
 app.listen(PORT, () => {
-  console.log(`Backend is listen on port ${PORT}`);
+  console.log(`Backend is listening on port ${PORT}`);
 });

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { UserService } from "../../core/services/UserService/userService";
-import { CreateUserServiceDto, LoginUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/UserService/userService.dto";
-import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError, UserWrongPasswordError } from '../../core/errors/userErrors';
+import { CreateUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "../../core/services/UserService/userService.dto";
+import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from '../../core/errors/userErrors';
 import { ErrorCode } from '../../core/errors/errorCodes';
 import { UserFieldsConfig } from '../../common/fieldsConfig';
 import { PostgreSQLUniqueError } from '../../core/errors/dbErrors';
-import { NoSecretKeyError } from '../../core/errors/tokenErrors';
+import { AuthRequest } from '../../common/interfaces';
 
 export class UserController {
   constructor(readonly userService: UserService) {}
@@ -118,104 +118,7 @@ export class UserController {
       });
     }
   }
-
-  async loginUser(req: Request, res: Response): Promise<void>{
-    try{
-      const { email, password } = req.body as { email: string, password: string };
-
-      //Exists required fields
-      if(!email || !password){
-        res.status(400).json({
-          error: {
-            message: 'Missing required fields', 
-            code: ErrorCode.MISSING_REQUIRED_FIELD
-          }
-        });
-        return;
-      }
-
-      //Email validation
-      if(email.length < UserFieldsConfig.EMAIL_MIN_LENGTH || email.length > UserFieldsConfig.EMAIL_MAX_LENGTH){
-        res.status(422).json({
-          error:{
-            message: 'Invalid email',
-            code: ErrorCode.INVALID_EMAIL_FORMAT
-          }
-        });
-        return;
-      }
-
-      //Password validation
-      if(password.length < UserFieldsConfig.PASSWORD_MIN_LENGTH || password.length > UserFieldsConfig.PASSWORD_MAX_LENGTH){
-        res.status(422).json({
-          error:{
-            message: 'Invalid user password',
-            code: ErrorCode.INVALID_USER_PASSWORD_FORMAT
-          }
-        });
-        return;
-      }
-
-      //Make Dto
-      const loginUserServiceDto: LoginUserServiceDto = {
-        email: email,
-        password: password,
-      }
-
-      //Check password correct
-      const { access_token, refresh_token } = await this.userService.login(loginUserServiceDto);
-
-      res.cookie('refresh_token', refresh_token, {
-        httpOnly: UserFieldsConfig.REFRESH_HTTP_ONLY,
-        secure: UserFieldsConfig.REFRESH_SECURE,
-        sameSite: UserFieldsConfig.REFRESH_SAMESITE,
-        path: UserFieldsConfig.REFRESH_PATH,
-        maxAge: UserFieldsConfig.REFRESH_TOKEN_EXPIRE_TIME
-      });
-
-      res.status(200).json({
-        access_token: access_token
-      });
-    }catch(err){
-      if(err instanceof UserNotFoundByEmailError){
-        res.status(404).json({
-          error:{
-            message: 'User not found',
-            code: ErrorCode.USER_NOT_FOUND
-          }
-        });
-        return;
-      }
-
-      if(err instanceof NoSecretKeyError){
-        res.status(500).json({
-          error:{
-            message: 'Internal server error, no secret key',
-            code: ErrorCode.INTERNAL_SERVER_ERROR
-          }
-        });
-        return;
-      }
-
-      if(err instanceof UserWrongPasswordError){
-        res.status(403).json({
-          error: {
-            message: 'Wrong password',
-            code: ErrorCode.WRONG_PASSWORD
-          }
-        });
-        return;
-      }
-
-      res.status(500).json({
-        error:{
-          message: "Internal server error",
-          code: ErrorCode.INTERNAL_SERVER_ERROR
-        }
-      });
-    }
-  }
-
+  //Dev
   async getAllUsers(req: Request, res: Response): Promise<void>{
     try{
       const users = await this.userService.getAll();
@@ -279,7 +182,7 @@ export class UserController {
       });
     }
   }
-
+  //Dev
   async getUserById(req: Request, res: Response): Promise<void>{
     try{
       const { id } = req.params as { id: string };
@@ -329,6 +232,31 @@ export class UserController {
     }
   }
 
+  async getUser(req: AuthRequest, res: Response): Promise<void>{
+    try{
+      const user = await this.userService.getById(req.user_id);
+      res.status(200).json(user);
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+      return;
+    }
+  }
+  //Dev
   async getUserByEmail(req: Request, res: Response): Promise<void>{
     try{
       const { email } = req.body as { email: string };
@@ -364,30 +292,16 @@ export class UserController {
     }
   }
 
-  async updateUserPassword(req: Request, res: Response): Promise<void>{
+  async updateUserPassword(req: AuthRequest, res: Response): Promise<void>{
     try{
-      const { id } = req.params as { id: string }; // change
       const { password } = req.body as { password: string };
 
       //Exists required fields
-      if(!id || !password){
+      if(!password){
         res.status(400).json({
           error: {
             message: 'Missing required fields',
             code: ErrorCode.MISSING_REQUIRED_FIELD
-          }
-        });
-        return;
-      }
-
-      const number_id = parseInt(id);
-
-      //Validate id as number
-      if(isNaN(number_id) || number_id < 0){
-        res.status(422).json({
-          error: {
-            message: 'Invalid user id',
-            code: ErrorCode.INVALID_INPUT
           }
         });
         return;
@@ -405,7 +319,7 @@ export class UserController {
       }
 
       const updateUserPasswordServiceDto: UpdateUserPasswordServiceDto = {
-        id: number_id,
+        id: req.user_id,
         password: password
       }
 
@@ -440,30 +354,16 @@ export class UserController {
     }
   } 
 
-  async updateUserEmail(req: Request, res: Response): Promise<void>{
+  async updateUserEmail(req: AuthRequest, res: Response): Promise<void>{
     try{
-      const { id } = req.params as { id: string }; // change
       const { email } = req.body as { email: string };
 
       //Exists required fields
-      if(!id || !email){
+      if(!email){
         res.status(400).json({
           error: {
             message: 'Missing required fields',
             code: ErrorCode.MISSING_REQUIRED_FIELD
-          }
-        });
-        return;
-      }
-
-      const number_id = parseInt(id);
-
-      //Validate id as number
-      if(isNaN(number_id) || number_id < 0){
-        res.status(422).json({
-          error: {
-            message: 'Invalid user id',
-            code: ErrorCode.INVALID_INPUT
           }
         });
         return;
@@ -481,7 +381,7 @@ export class UserController {
       }
 
       const updateUserEmailServiceDto: UpdateUserEmailServiceDto = {
-        id: number_id,
+        id: req.user_id,
         email: email
       }
 
@@ -525,30 +425,16 @@ export class UserController {
     }
   }
 
-  async updateUserFio(req: Request, res: Response): Promise<void>{
+  async updateUserFio(req: AuthRequest, res: Response): Promise<void>{
     try{
-      const { id } = req.params as { id: string }; // change
       const { first_name, last_name, middle_name } = req.body as { first_name: string, last_name: string, middle_name?: string };
 
       //Exists required fields
-      if(!id || !first_name || !last_name){
+      if(!first_name || !last_name){
         res.status(400).json({
           error: {
             message: 'Missing required fields',
             code: ErrorCode.MISSING_REQUIRED_FIELD
-          }
-        });
-        return;
-      }
-
-      const number_id = parseInt(id);
-
-      //Validate id as number
-      if(isNaN(number_id) || number_id < 0){
-        res.status(422).json({
-          error: {
-            message: 'Invalid user id',
-            code: ErrorCode.INVALID_INPUT
           }
         });
         return;
@@ -588,7 +474,7 @@ export class UserController {
       }
 
       const updateUserFioServiceDto: UpdateUserFioServiceDto = {
-        id: number_id,
+        id: req.user_id,
         first_name: first_name,
         last_name: last_name,
         middle_name: middle_name === undefined ? null : middle_name,
@@ -625,38 +511,15 @@ export class UserController {
     }
   }
 
-  async updateUserAvatar(req: Request, res: Response): Promise<void>{
+  async updateUserAvatar(req: AuthRequest, res: Response): Promise<void>{
     try{
-      const { id } = req.params as { id: string }; // change
       const { avatar_url } = req.body as { avatar_url: string | null };
 
-      //Exists required fields
-      if(!id){
-        res.status(400).json({
-          error: {
-            message: 'Missing required fields',
-            code: ErrorCode.MISSING_REQUIRED_FIELD
-          }
-        });
-        return;
-      }
-
-      const number_id = parseInt(id);
-
-      //Validate id as number
-      if(isNaN(number_id) || number_id < 0){
-        res.status(422).json({
-          error: {
-            message: 'Invalid user id',
-            code: ErrorCode.INVALID_INPUT
-          }
-        });
-        return;
-      }
+      const newAvatarUrl = (!avatar_url || avatar_url.trim() === '') ? null : avatar_url.trim();
 
       const updateUserAvatarServiceDto: UpdateUserAvatarServiceDto = {
-        id: number_id,
-        avatar_url: (typeof avatar_url !== 'string' || avatar_url.trim() === '') ? null : avatar_url.trim(),
+        id: req.user_id,
+        avatar_url: newAvatarUrl,
       }
 
       const newUser = await this.userService.updateAvatar(updateUserAvatarServiceDto);
@@ -689,10 +552,10 @@ export class UserController {
       });
     }
   }
-
-  async deleteUser(req: Request, res: Response): Promise<void>{
+  //Dev
+  async deleteUserById(req: Request, res: Response): Promise<void>{
     try{
-      const { id } = req.params as { id: string }; // change
+      const { id } = req.params as { id: string };
 
       //Exists required fields
       if(!id){
@@ -720,6 +583,30 @@ export class UserController {
 
       const deletedUser = await this.userService.delete(number_id);
       res.status(204).json(`User with id:${number_id} deleted successfully`)
+    }catch(err){
+      if(err instanceof UserNotFoundError){
+        res.status(404).json({
+          error: {
+            message: 'User not found',
+            code: ErrorCode.USER_NOT_FOUND
+          }
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          code: ErrorCode.INTERNAL_SERVER_ERROR
+        }
+      });
+    }
+  }
+
+  async deleteUser(req: AuthRequest, res: Response): Promise<void>{
+    try{
+      const deletedUser = await this.userService.delete(req.user_id);
+      res.status(204).json(`User with id:${req.user_id} deleted successfully`)
     }catch(err){
       if(err instanceof UserNotFoundError){
         res.status(404).json({
