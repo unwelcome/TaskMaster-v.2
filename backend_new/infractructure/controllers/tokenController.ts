@@ -318,7 +318,7 @@ export class TokenController{
     }
   }
 
-  async closeAllExceptCurrent(req: AuthRequest, res: Response): Promise<void>{
+  async closeAllTokensAndCreateNew(req: AuthRequest, res: Response): Promise<void>{
     try{
       const userIp = this.getClientIp(req);
 
@@ -328,7 +328,7 @@ export class TokenController{
         user_agent: req.headers['user-agent'] ? req.headers['user-agent'] : '',
       }
 
-      const { access_token, refreshTokenId } = await this.tokenService.deleteAllTokens(deleteAllRefreshTokenServiceDto);
+      const { access_token, refreshTokenId } = await this.tokenService.deleteAllTokensAndCreateNew(deleteAllRefreshTokenServiceDto);
 
       this.saveTokens(res, access_token, refreshTokenId);
     }catch(err){

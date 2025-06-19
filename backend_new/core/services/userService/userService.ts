@@ -1,12 +1,8 @@
-import { UserFieldsConfig } from "../../../common/fieldsConfig";
 import { checkPassword, hashPassword } from "../../../common/passwordHelpers";
-import { NoSecretKeyError } from "../../errors/tokenErrors";
 import { UserAlreadyExistsError, UserNotChangedError, UserNotFoundByEmailError, UserNotFoundError } from "../../errors/userErrors";
 import { UserRepository } from "../../repositories/UserRepository/userRepository";
 import { CreateUserRepositoryDto, UpdateUserAvatarRepositoryDto, UpdateUserEmailRepositoryDto, UpdateUserFioRepositoryDto, UpdateUserPasswordRepositoryDto } from "../../repositories/UserRepository/userRepository.dto";
 import { CreateUserServiceDto, UpdateUserAvatarServiceDto, UpdateUserEmailServiceDto, UpdateUserFioServiceDto, UpdateUserPasswordServiceDto } from "./userService.dto";
-import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from 'uuid';
 
 export class UserService{
   constructor(readonly userRepository: UserRepository) {}

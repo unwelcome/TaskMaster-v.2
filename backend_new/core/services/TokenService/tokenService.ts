@@ -142,10 +142,19 @@ export class TokenService{
     }
   }
 
-  async deleteAllTokens(dto: DeleteAllRefreshTokenServiceDto){
+  async deleteAllTokens(user_id: number){
     try{
       //Удаляем все токены пользователя
-      await this.tokenRepository.deleteAllRefreshTokens(dto.user_id);
+      await this.tokenRepository.deleteAllRefreshTokens(user_id);
+    }catch(err){
+      throw err;
+    }
+  }
+
+  async deleteAllTokensAndCreateNew(dto: DeleteAllRefreshTokenServiceDto){
+    try{
+      //Удаляем все токены пользователя
+      await this.deleteAllTokens(dto.user_id);
 
       //Создаем новый токен
       const createTokenServiceDto: CreateTokenServiceDto = {
