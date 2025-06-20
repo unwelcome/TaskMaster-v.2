@@ -41,17 +41,16 @@ CREATE TABLE IF NOT EXISTS "groups" (
   "title" varchar(255) NOT NULL,
   "password_hash" varchar(255) NOT NULL,
   "password_salt" varchar(255) NOT NULL,
+
   "score_limit" float DEFAULT NULL,
   "topic_limit" integer DEFAULT NULL,
   "group_status" group_status DEFAULT 'open',
-  "chat_status" chat_status DEFAULT 'open',
   "enable_senior" boolean DEFAULT FALSE,
-  "created_by" integer
-);
 
-CREATE TABLE IF NOT EXISTS "senior_access" (
-  "id" serial PRIMARY KEY,
-  "group_id" integer,
+  "created_by" integer,
+  "created_at" timestamp NOT NULL DEFAULT NOW(),
+  "delete_at" timestamp DEFAULT NULL,
+
   "use_closed_chat" boolean DEFAULT FALSE,
   "create_seminars" boolean DEFAULT FALSE,
   "create_topics" boolean DEFAULT FALSE,
@@ -67,7 +66,9 @@ CREATE TABLE IF NOT EXISTS "group_members" (
 
 CREATE TABLE IF NOT EXISTS "chats" (
   "id" serial PRIMARY KEY,
-  "group_id" integer
+  "group_id" integer,
+  "status" chat_status DEFAULT 'open',
+  "title" varchar(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "chat_messages" (
@@ -75,7 +76,8 @@ CREATE TABLE IF NOT EXISTS "chat_messages" (
   "chat_id" integer,
   "author_id" integer,
   "created_at" timestamp DEFAULT NOW(),
-  "message" text NOT NULL
+  "message" text NOT NULL,
+  "is_edited" boolean DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS "seminars" (
@@ -121,7 +123,6 @@ CREATE TABLE IF NOT EXISTS "performance" (
 
 ALTER TABLE "groups" DROP CONSTRAINT IF EXISTS "groups_title_password_hash_unique";
 ALTER TABLE "groups" DROP CONSTRAINT IF EXISTS "groups_created_by_users";
-ALTER TABLE "senior_access" DROP CONSTRAINT IF EXISTS "groups_senior_access";
 ALTER TABLE "group_members" DROP CONSTRAINT IF EXISTS "group_members_users";
 ALTER TABLE "group_members" DROP CONSTRAINT IF EXISTS "group_members_groups";
 ALTER TABLE "chats" DROP CONSTRAINT IF EXISTS "chats_groups";
@@ -139,8 +140,6 @@ ALTER TABLE "performance" DROP CONSTRAINT IF EXISTS "performance_seminars";
 ALTER TABLE "groups" ADD CONSTRAINT "groups_title_password_hash_unique" UNIQUE(title, password_hash);
 
 ALTER TABLE "groups" ADD CONSTRAINT "groups_created_by_users" FOREIGN KEY ("created_by") REFERENCES "users" ("id") ON DELETE CASCADE;
-
-ALTER TABLE "senior_access" ADD CONSTRAINT "groups_senior_access" FOREIGN KEY ("group_id") REFERENCES "groups" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "group_members" ADD CONSTRAINT "group_members_users" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
 
