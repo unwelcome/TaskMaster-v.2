@@ -3,6 +3,7 @@ export interface CreateGroupRepositoryDto{
   password_hash: string,
   password_salt: string,
   created_by: number,
+  delete_at: Date | null,
 }
 
 export interface UpdateGroupPasswordRepositoryDto{

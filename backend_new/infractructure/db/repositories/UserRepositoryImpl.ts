@@ -18,7 +18,7 @@ export class UserRepositoryImpl implements UserRepository{
   async create(dto: CreateUserRepositoryDto): Promise<User> {
     try{
       const result = await db.query(
-        'INSERT INTO users (password_hash, password_salt, email, last_name, first_name, middle_name, avatar_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', 
+        'INSERT INTO users (password_hash, password_salt, email, last_name, first_name, middle_name, avatar_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', 
         [dto.password_hash, dto.password_salt, dto.email, dto.last_name, dto.first_name, dto.middle_name, dto.avatar_url]);
       return result.rows[0];
     }catch(err){

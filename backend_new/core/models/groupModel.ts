@@ -4,14 +4,14 @@ export interface Group{
   password_hash: string,
   password_salt: string,
   //Group settings
-  score_limit: number,
-  topic_limit: number,
+  score_limit: number | null,
+  topic_limit: number | null,
   group_status: 'open' | 'close',
-  enable_senior: boolean ,
+  enable_senior: boolean,
 
   created_by: number,
   created_at: Date,
-  delete_at: Date, 
+  delete_at: Date | null, 
   //Senior accesses
   use_closed_chat: boolean,
   create_seminars: boolean,
