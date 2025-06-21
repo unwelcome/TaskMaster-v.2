@@ -26,3 +26,11 @@ export const UserFieldsConfig = {
   REFRESH_SECURE: process.env.NODE_ENV === 'production',
   REFRESH_SAMESITE: 'strict' as boolean | "strict" | "none" | "lax" | undefined,
 }
+
+export const GroupFieldsConfig = {
+  TITLE_MIN_LENGTH: 3,
+  TITLE_MAX_LENGTH: 254,
+
+  PASSWORD_MIN_LENGTH: 2,
+  PASSWORD_MAX_LENGTH: 40,
+}

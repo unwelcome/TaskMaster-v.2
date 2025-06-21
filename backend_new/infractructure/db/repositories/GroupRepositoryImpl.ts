@@ -2,7 +2,8 @@ import { Group, GroupWithRole } from "../../../core/models/groupModel";
 import { GroupRepository } from "../../../core/repositories/GroupRepository/groupRepository";
 import { GetGroupWithRoleRepositoryDto, CreateGroupRepositoryDto, UpdateGroupPasswordRepositoryDto, UpdateGroupSettingsRepositoryDto } from "../../../core/repositories/GroupRepository/groupRepository.dto";
 import * as db from "../postgresql";
-import { PostgreSQLError, PostgreSQLUniqueError } from "../../../core/errors/dbErrors";
+import { PostgreSQLError } from "../../../core/errors/dbErrors";
+import { GroupAlreadyExistsError, GroupNotFoundError } from "../../../core/errors/groupErrors";
 
 export class GroupRepositoryImpl implements GroupRepository{
   async getGroupById(group_id: number): Promise<Group> {
@@ -47,7 +48,7 @@ export class GroupRepositoryImpl implements GroupRepository{
       await client.query('BEGIN');
 
       const groupCreateResult = await db.query(`INSERT INTO groups (title, password_hash, password_salt, created_by, delete_at) VALUES ($1, $2, $3, $4, $5) RETURNING *`, 
-        [ dto.title, dto.password_hash, dto.password_salt, dto.created_by, dto.delete_at ]);
+        [ dto.title, dto.password_hash, dto.password_salt, dto.created_by, dto.delete_at === null ? null : dto.delete_at.toISOString() ]);
 
       //Проверяем что данные вставились в таблицу
       if(groupCreateResult.rowCount === 0) throw new PostgreSQLError('Insert into groups table error');
@@ -66,7 +67,7 @@ export class GroupRepositoryImpl implements GroupRepository{
         client.query('ROLLBACK');
       }
       if (err.code === '23505') {  // Ошибка нарушения уникальности группы
-        throw new PostgreSQLUniqueError(`group with title: ${dto.title} and password_hash: ${dto.password_hash} already exists`);
+        throw new GroupAlreadyExistsError(dto.title, dto.password_hash);
       }
       throw new PostgreSQLError('Create group error');
     }finally{
@@ -75,15 +76,44 @@ export class GroupRepositoryImpl implements GroupRepository{
     }
   }
 
-  updateGroupPassword(dto: UpdateGroupPasswordRepositoryDto): Promise<Group> {
-    throw new Error("Method not implemented.");
+  async updateGroupPassword(dto: UpdateGroupPasswordRepositoryDto): Promise<Group> {
+    try{
+      const result = await db.query('UPDATE groups SET password_hash = $2, password_salt = $3 WHERE id = $1 RETURNING *', [dto.id, dto.password_hash, dto.password_salt]);
+      if(result.rowCount === 0) throw new GroupNotFoundError(dto.id);
+      return result.rows[0];
+    }catch(err){
+      throw new PostgreSQLError('Update group password error');
+    }
   }
-  updateGroupSettings(dto: UpdateGroupSettingsRepositoryDto): Promise<Group> {
-    throw new Error("Method not implemented.");
+  async updateGroupSettings(dto: UpdateGroupSettingsRepositoryDto): Promise<Group> {
+    try{
+      const result = await db.query(`UPDATE groups SET 
+        score_limit = $2, 
+        topic_limit = $3,
+        group_status = $4,
+        enable_senior = $5,
+        use_closed_chat = $6,
+        create_seminars = $7,
+        create_topics = $8,
+        evaluate_topics = $9
+        WHERE id = $1 RETURNING *`, 
+        [dto.id, dto.score_limit, dto.topic_limit, dto.group_status, dto.enable_senior, dto.use_closed_chat, dto.create_seminars, dto.create_topics, dto.evaluate_topics]);
+      
+        if(result.rowCount === 0) throw new GroupNotFoundError(dto.id);
+      return result.rows[0];
+    }catch(err){
+      throw new PostgreSQLError('Update group settings error');
+    }
   }
 
-  deleteGroupById(group_id: number): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async deleteGroupById(group_id: number): Promise<boolean> {
+    try{
+      const result = await db.query('DELETE FROM groups WHERE id = $1', [group_id]);
+      if(result.rowCount === 0) throw new GroupNotFoundError(group_id);
+      return result.rows[0];
+    }catch(err){
+      throw new PostgreSQLError('Delete group error');
+    }
   }
 
 }

@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { logsController } from "./infractructure/controllers/logsController";
 import { devController } from "./infractructure/controllers/devController";
-import { getAccountController, getTokenController, getUserController } from "./infractructure/factories/factory";
+import { getAccountController, getGroupController, getTokenController, getUserController } from "./infractructure/factories/factory";
 import { AuthRequest } from "./common/interfaces";
 
 const router = Router();
@@ -9,6 +9,7 @@ const router = Router();
 const userController = getUserController();
 const tokenController = getTokenController();
 const accountController = getAccountController();
+const groupController = getGroupController();
 
 //Logs
 router.use(logsController);
@@ -42,5 +43,10 @@ router.patch('/auth/user/:id/avatar', (req: Request, res: Response) => userContr
 router.delete('/dev/user/:id', (req: Request, res: Response) => accountController.deleteAccountById(req, res));
 
 router.delete('/auth/user', (req: Request, res: Response) => accountController.deleteAccount(req as AuthRequest, res));
+
+//Group routes
+router.get('/dev/groups', (req: Request, res: Response) => groupController.getAllGroups(req, res));
+
+router.post('/auth/group', (req: Request, res: Response) => groupController.createGroup(req as  AuthRequest, res));
 
 export default router;

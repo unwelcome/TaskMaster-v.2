@@ -16,8 +16,12 @@ export const enum ErrorCode {
   INVALID_FIRST_NAME_FORMAT = "INVALID_FIRST_NAME_FORMAT",        // Неверный формат имени пользователя
   INVALID_LAST_NAME_FORMAT = "INVALID_LAST_NAME_FORMAT",          // Неверный формат фамилии пользователя
   INVALID_MIDDLE_NAME_FORMAT = "INVALID_MIDDLE_NAME_FORMAT",      // Неверный формат отчества пользователя
+  INVALID_GROUP_TITLE_FORMAT = "INVALID_GROUP_TITLE_FORMAT",      // Неверный формат названия группы
+  INVALID_GROUP_PASSWORD_FORMAT = "INVALID_GROUP_PASSWORD_FORMAT",// Неверный формат пароля группы
   MISSING_REQUIRED_FIELD = "MISSING_REQUIRED_FIELD",              // Отсутствует обязательное поле
   INVALID_INPUT = "INVALID_INPUT",                                // Некорректный ввод данных
+
+  GROUP_ALREADY_EXISTS = "GROUP_ALREADY_EXISTS",    // Группа уже существует
 
   // Другие ошибки
   INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",  // Внутренняя ошибка сервера
@@ -74,11 +78,21 @@ export const ErrorMessages = {
   INVALID_MIDDLE_NAME_FORMAT: {
     ru: 'Неверное отчество пользователя'
   },
+  INVALID_GROUP_TITLE_FORMAT: {
+    ru: 'Неверное название группы'
+  },
+  INVALID_GROUP_PASSWORD_FORMAT: {
+    ru: 'Неверный пароль группы'
+  },
   MISSING_REQUIRED_FIELD: {
     ru: 'Отсутствует обязательное поле'
   },
   INVALID_INPUT: {
     ru: 'Неверные данные'
+  },
+
+  GROUP_ALREADY_EXISTS: {
+    ru: 'Данная группа уже существует'
   },
 
   // Другие ошибки
