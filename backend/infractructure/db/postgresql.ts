@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 
-const host = process.env.NODE_ENV === 'production' ? process.env.POSTGRES_HOST : 'localhost'
+const host = process.env.NODE_ENV === 'development' ? 'localhost' : process.env.POSTGRES_HOST;
 const port = process.env.POSTGRES_PORT === undefined ? 5432 : parseInt(process.env.POSTGRES_PORT);
 const database = process.env.POSTGRES_DB;
 const user = process.env.POSTGRES_USER;
@@ -16,6 +16,14 @@ const pool = new Pool({
   // idleTimeoutMillis: 30000, 
   // connectionTimeoutMillis: 2000,
 });
+
+// console.log('POSTGRES CONNECT DATA:', {
+//   host: host,
+//   port: port,
+//   database: database,
+//   user: user,
+//   password: password,
+// })
 
 // Функция для выполнения SQL запросов
 export async function query(text: string, params?: any[]) {

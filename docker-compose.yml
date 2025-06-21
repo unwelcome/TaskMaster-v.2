@@ -25,6 +25,9 @@ services:
     depends_on:
       - postgres
       - redis
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+    command: "npm run start"
     networks:
       - app-network
   
@@ -55,7 +58,7 @@ services:
       - REDIS_USER=${REDIS_USER}
       - REDIS_USER_PASSWORD=${REDIS_USER_PASSWORD}
     ports:
-      - "6380:6379"
+      - "6379:6379"
     volumes:
       - ./redisdata:/data
     deploy:
